@@ -17,16 +17,17 @@ class SerialThread(threading.Thread):
         self.init_timestamp = time.strftime("%Y_%m_%d_%H%M%S", time.localtime())
         self.logfile = None
         
-        filename = f"serial_log_{self.init_timestamp}.csv"
-        try:
-            self.logfile = open(filename, 'a', newline='')
-        except IOError as e:
-            print(f"Error opening file: {e}")
-
     def run(self):
         try:
             self.ser = serial.Serial(self.serial_port, self.baud_rate)
             self.running = True
+            
+            filename = f"serial_log_{self.init_timestamp}.csv"
+            try:
+                self.logfile = open(filename, 'a', newline='')
+            except IOError as e:
+                print(f"Error opening file: {e}")
+                    
         except serial.SerialException as e:
             print(f"Error opening serial port: {e}")
             return
