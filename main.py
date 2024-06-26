@@ -3,6 +3,7 @@ from tkinter import ttk
 import threading
 import serial
 import queue
+import tkpanels as tkp
 
 class SerialSetup(tk.Frame):
     """User interface for setting up serial connection"""
@@ -103,10 +104,14 @@ class SerialApp:
 
     def setup_gui(self):
         
-        self.serial_setup = SerialSetup(self.root, self.connect_serial)
-        self.serial_setup.place(x=0, y=0, relwidth=0.5, relheight=0.5)
+        self.controls = tkp.ControlsFrame(self.root)
+        self.controls.place(relx=0, rely=0, relwidth=0.5, relheight=0.5)
+        
+        # FIXME: Placement keeps breaking
+        # self.serial_setup = SerialSetup(self.root, self.connect_serial)
+        # self.serial_setup.place(x=0, y=0, relwidth=0.5, relheight=0.5)
 
-        self.terminal = Terminal(self.root, self.send_data)
+        self.terminal = tkp.CLIFrame(self.root, self.send_data)
         self.terminal.place(relx=0, rely=0.5, relwidth=0.5, relheight=0.5)
 
     def connect_serial(self, event=None):
