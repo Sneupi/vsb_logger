@@ -269,7 +269,8 @@ class SerialSetup(tk.Frame):
         
         self.port_options = self.get_available_ports()
         self.port_var = tk.StringVar(self)
-        self.port_var.set(self.port_options[0])
+        if self.port_options:
+            self.port_var.set(self.port_options[0])
         self.port_dropdown = ttk.Combobox(self, textvariable=self.port_var, values=self.port_options)
         self.port_dropdown.pack(side='left', padx=5, pady=5)
         
