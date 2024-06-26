@@ -241,7 +241,7 @@ class CLIFrame(tk.Frame):
         
     def get_entry(self):
         """NOTE: Clears entry after returns"""
-        data = self.in_str.get()
+        data = self.in_str.get() + '\n'
         self.in_str.set("")
         return data
 
