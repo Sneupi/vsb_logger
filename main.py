@@ -1,81 +1,8 @@
 import tkinter as tk
-from tkinter import ttk
 import threading
 import serial
 import queue
 import tkpanels as tkp
-
-import serial.tools.list_ports
-
-class SerialSetup(tk.Frame):
-    """User interface for setting up serial connection"""
-    def __init__(self, parent, connect_func):
-        super().__init__(parent)
-        
-        self.port_label = tk.Label(self, text="Port:")
-        self.port_label.pack(side='left', padx=5, pady=5)
-        
-        self.port_options = self.get_available_ports()
-        self.port_var = tk.StringVar(self)
-        self.port_var.set(self.port_options[0])
-        self.port_dropdown = ttk.Combobox(self, textvariable=self.port_var, values=self.port_options)
-        self.port_dropdown.pack(side='left', padx=5, pady=5)
-        
-        self.baud_label = tk.Label(self, text="Baud:")
-        self.baud_label.pack(side='left', padx=5, pady=5)
-
-        self.baud_options = ['9600', '19200', '38400', '57600', '115200']
-        self.baud_var = tk.StringVar(self)
-        self.baud_var.set(self.baud_options[4])
-        self.baud_dropdown = ttk.Combobox(self, textvariable=self.baud_var, values=self.baud_options)
-        self.baud_dropdown.pack(side='left', padx=5, pady=5)
-
-        self.connect_button = tk.Button(self, text="Connect", command=connect_func)
-        self.connect_button.bind('<Return>', connect_func)
-        self.connect_button.pack(side='right', padx=5, pady=5)
-        
-        self.refresh_button = tk.Button(self, text="Refresh", command=self.refresh_ports)
-        self.refresh_button.pack(side='right', padx=5, pady=5)
-    
-    def get_available_ports(self):
-        ports = []
-        for port in serial.tools.list_ports.comports():
-            ports.append(port.device)
-        return ports
-    
-    def get_port(self):
-        return self.port_var.get()
-    
-    def get_baud(self):
-        return self.baud_var.get()
-    
-    def refresh_ports(self):
-        self.port_options = self.get_available_ports()
-        self.port_dropdown['values'] = self.port_options
-
-class Terminal(tk.Frame):
-    def __init__(self, parent, send_func):
-        super().__init__(parent)
-        self.text = tk.Text(self, state='disabled')
-        self.text.config(width=80, height=20, bg='black', fg='white')
-        self.text.place(x=0, y=0, relwidth=1, relheight=0.8)
-        
-        self.send_entry = tk.Entry(self, width=80)
-        self.send_entry.bind('<Return>', send_func)
-        self.send_entry.place(x=0, rely=0.8, relwidth=1, relheight=0.1)
-        
-    def log_message(self, message):
-        self.text.config(state='normal')
-        self.text.insert('end', message)
-        self.text.config(state='disabled')
-        self.text.see('end')
-    
-    def get_entry(self):
-        """NOTE: Clears entry after returns"""
-        data = self.send_entry.get()
-        self.send_entry.delete(0, 'end')
-        return data
-    
 
 class SerialThread(threading.Thread):
     def __init__(self, serial_port, baud_rate, data_queue):
@@ -131,7 +58,7 @@ class SerialApp:
         self.controls = tkp.ControlsFrame(self.root)
         self.controls.place(relx=0, rely=0, relwidth=0.4, relheight=0.4)
         
-        self.serial_setup = SerialSetup(self.root, self.connect_serial)
+        self.serial_setup = tkp.SerialSetup(self.root, self.connect_serial)
         self.serial_setup.place(relx=0, rely=0.9, relwidth=0.4, relheight=0.1)
 
         self.terminal = tkp.CLIFrame(self.root, self.send_data)
