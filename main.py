@@ -29,6 +29,8 @@ class SerialThread(threading.Thread):
             except serial.SerialException as e:
                 print(f"Serial read error: {e}")
                 self.running = False
+            except UnicodeDecodeError as e:
+                print(f"Unicode error: {e}")
 
     def stop(self):
         self.running = False
@@ -39,9 +41,9 @@ class SerialThread(threading.Thread):
                 print(f"Error closing serial port: {e}")
 
 class SerialApp:
-    def __init__(self, root):
+    def __init__(self, root: tk.Tk):
         self.root = root
-        self.root.title("Serial Communication App")
+        self.root.title("App")
 
         self.data_queue = queue.Queue()
         self.serial_thread = None
@@ -63,6 +65,7 @@ class SerialApp:
         self.baud_entry.pack(padx=10, pady=5)
 
         self.connect_button = tk.Button(self.root, text="Connect", command=self.connect_serial)
+        self.connect_button.bind('<Return>', self.connect_serial)
         self.connect_button.pack(padx=10, pady=5)
 
         self.terminal = tk.Text(self.root, state='disabled', width=80, height=20)
@@ -72,7 +75,7 @@ class SerialApp:
         self.send_entry.bind('<Return>', self.send_data)
         self.send_entry.pack(padx=10, pady=10)
 
-    def connect_serial(self):
+    def connect_serial(self, event=None):
         port = self.port_entry.get()
         baud_rate = self.baud_entry.get()
         
@@ -96,7 +99,7 @@ class SerialApp:
         if self.serial_thread and self.serial_thread.ser and self.serial_thread.ser.is_open:
             try:
                 self.serial_thread.ser.write(data.encode('utf-8'))
-                self.log_message(f"Sent: {data}")
+                self.log_message(data)
             except serial.SerialException as e:
                 print(f"Serial write error: {e}")
 
