@@ -3,6 +3,8 @@ import threading
 import serial
 import queue
 import tkpanels as tkp
+import time
+import csv
 
 class SerialThread(threading.Thread):
     def __init__(self, serial_port, baud_rate, data_queue):
@@ -12,6 +14,14 @@ class SerialThread(threading.Thread):
         self.data_queue = data_queue
         self.running = False
         self.ser = None
+        self.init_timestamp = time.strftime("%Y_%m_%d_%H%M%S", time.localtime())
+        self.logfile = None
+        
+        filename = f"serial_log_{self.init_timestamp}.csv"
+        try:
+            self.logfile = open(filename, 'a', newline='')
+        except IOError as e:
+            print(f"Error opening file: {e}")
 
     def run(self):
         try:
@@ -39,6 +49,8 @@ class SerialThread(threading.Thread):
                 self.ser.close()
             except serial.SerialException as e:
                 print(f"Error closing serial port: {e}")
+        if self.logfile:
+            self.logfile.close()
 
 class SerialApp:
     def __init__(self, root: tk.Tk):
@@ -79,7 +91,8 @@ class SerialApp:
     def process_serial_data(self):
         while not self.data_queue.empty():
             data = self.data_queue.get()
-            self.log_message(data)
+            self.log_message(data, True)
+            self.terminal.insert(data)
         self.root.after(100, self.process_serial_data)
 
     def send_data(self, event=None):
@@ -87,12 +100,15 @@ class SerialApp:
         if self.serial_thread and self.serial_thread.ser and self.serial_thread.ser.is_open:
             try:
                 self.serial_thread.ser.write(data.encode('utf-8'))
-                self.log_message(data)
+                self.log_message(data.strip(), False)
+                self.terminal.insert(data)
             except serial.SerialException as e:
                 print(f"Serial write error: {e}")
 
-    def log_message(self, message):
-        self.terminal.log_message(message)
+    def log_message(self, message, is_rx):
+        if self.serial_thread and self.serial_thread.logfile:
+            writer = csv.writer(self.serial_thread.logfile)
+            writer.writerow(['RX' if is_rx else 'TX', message])
 
     def on_closing(self):
         if self.serial_thread and self.serial_thread.running:

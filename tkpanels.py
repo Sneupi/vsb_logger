@@ -225,7 +225,7 @@ class CLIFrame(tk.Frame):
         self.out_txt.delete("1.0", tk.END)
         self.out_txt.config(state=tk.DISABLED)
     
-    def log_message(self, msg: str):
+    def insert(self, msg: str):
         """Insert a message into the terminal"""
         self.out_txt.config(state=tk.NORMAL)
         self.out_txt.insert(tk.END, "> {}\n".format(msg.rstrip('\n')))
