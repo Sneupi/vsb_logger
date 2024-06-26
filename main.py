@@ -4,6 +4,31 @@ import threading
 import serial
 import queue
 
+class SerialSetup(tk.Frame):
+    """User interface for setting up serial connection"""
+    def __init__(self, parent, connect_func):
+        super().__init__(parent)
+        self.port_label = tk.Label(parent, text="Serial Port:")
+        self.port_label.pack(padx=10, pady=5)
+
+        self.port_entry = tk.Entry(parent)
+        self.port_entry.pack(padx=10, pady=5)
+
+        self.baud_label = tk.Label(parent, text="Baud Rate:")
+        self.baud_label.pack(padx=10, pady=5)
+
+        self.baud_entry = tk.Entry(parent)
+        self.baud_entry.pack(padx=10, pady=5)
+
+        self.connect_button = tk.Button(parent, text="Connect", command=connect_func)
+        self.connect_button.bind('<Return>', connect_func)
+        self.connect_button.pack(padx=10, pady=5)
+    
+    def get_port(self):
+        return self.port_entry.get()
+    def get_baud(self):
+        return self.baud_entry.get()
+
 class SerialThread(threading.Thread):
     def __init__(self, serial_port, baud_rate, data_queue):
         super().__init__()
@@ -52,21 +77,9 @@ class SerialApp:
         self.root.after(100, self.process_serial_data)
 
     def setup_gui(self):
-        self.port_label = tk.Label(self.root, text="Serial Port:")
-        self.port_label.pack(padx=10, pady=5)
-
-        self.port_entry = tk.Entry(self.root)
-        self.port_entry.pack(padx=10, pady=5)
-
-        self.baud_label = tk.Label(self.root, text="Baud Rate:")
-        self.baud_label.pack(padx=10, pady=5)
-
-        self.baud_entry = tk.Entry(self.root)
-        self.baud_entry.pack(padx=10, pady=5)
-
-        self.connect_button = tk.Button(self.root, text="Connect", command=self.connect_serial)
-        self.connect_button.bind('<Return>', self.connect_serial)
-        self.connect_button.pack(padx=10, pady=5)
+        
+        self.serial_setup = SerialSetup(self.root, self.connect_serial)
+        self.serial_setup.pack(padx=10, pady=10)
 
         self.terminal = tk.Text(self.root, state='disabled', width=80, height=20)
         self.terminal.pack(padx=10, pady=10)
@@ -76,8 +89,8 @@ class SerialApp:
         self.send_entry.pack(padx=10, pady=10)
 
     def connect_serial(self, event=None):
-        port = self.port_entry.get()
-        baud_rate = self.baud_entry.get()
+        port = self.serial_setup.get_port()
+        baud_rate = self.serial_setup.get_baud()
         
         if self.serial_thread and self.serial_thread.running:
             self.serial_thread.stop()
