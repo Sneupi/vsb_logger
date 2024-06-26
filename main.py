@@ -9,21 +9,15 @@ class SerialSetup(tk.Frame):
     """User interface for setting up serial connection"""
     def __init__(self, parent, connect_func):
         super().__init__(parent)
-        self.port_label = tk.Label(self, text="Serial Port:")
-        self.port_label.pack()
-
         self.port_entry = tk.Entry(self)
-        self.port_entry.pack()
-
-        self.baud_label = tk.Label(self, text="Baud Rate:")
-        self.baud_label.pack()
+        self.port_entry.pack(side='left', padx=5, pady=5)
 
         self.baud_entry = tk.Entry(self)
-        self.baud_entry.pack()
+        self.baud_entry.pack(side='left', padx=5, pady=5)
 
         self.connect_button = tk.Button(self, text="Connect", command=connect_func)
         self.connect_button.bind('<Return>', connect_func)
-        self.connect_button.pack()
+        self.connect_button.pack(side='right', padx=5, pady=5)
     
     def get_port(self):
         return self.port_entry.get()
@@ -94,7 +88,8 @@ class SerialApp:
     def __init__(self, root: tk.Tk):
         self.root = root
         self.root.title("App")
-        self.root.geometry("800x600")
+        self.root.geometry("1280x720")
+        self.root.resizable(False, False)
         
         self.data_queue = queue.Queue()
         self.serial_thread = None
@@ -105,14 +100,13 @@ class SerialApp:
     def setup_gui(self):
         
         self.controls = tkp.ControlsFrame(self.root)
-        self.controls.place(relx=0, rely=0, relwidth=0.5, relheight=0.5)
+        self.controls.place(relx=0, rely=0, relwidth=0.4, relheight=0.4)
         
-        # FIXME: Placement keeps breaking
-        # self.serial_setup = SerialSetup(self.root, self.connect_serial)
-        # self.serial_setup.place(x=0, y=0, relwidth=0.5, relheight=0.5)
+        self.serial_setup = SerialSetup(self.root, self.connect_serial)
+        self.serial_setup.place(relx=0, rely=0.9, relwidth=0.4, relheight=0.1)
 
         self.terminal = tkp.CLIFrame(self.root, self.send_data)
-        self.terminal.place(relx=0, rely=0.5, relwidth=0.5, relheight=0.5)
+        self.terminal.place(relx=0, rely=0.4, relwidth=0.4, relheight=0.5)
 
     def connect_serial(self, event=None):
         port = self.serial_setup.get_port()
