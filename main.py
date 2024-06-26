@@ -8,26 +8,50 @@ class SerialSetup(tk.Frame):
     """User interface for setting up serial connection"""
     def __init__(self, parent, connect_func):
         super().__init__(parent)
-        self.port_label = tk.Label(parent, text="Serial Port:")
-        self.port_label.pack(padx=10, pady=5)
+        self.port_label = tk.Label(self, text="Serial Port:")
+        self.port_label.pack()
 
-        self.port_entry = tk.Entry(parent)
-        self.port_entry.pack(padx=10, pady=5)
+        self.port_entry = tk.Entry(self)
+        self.port_entry.pack()
 
-        self.baud_label = tk.Label(parent, text="Baud Rate:")
-        self.baud_label.pack(padx=10, pady=5)
+        self.baud_label = tk.Label(self, text="Baud Rate:")
+        self.baud_label.pack()
 
-        self.baud_entry = tk.Entry(parent)
-        self.baud_entry.pack(padx=10, pady=5)
+        self.baud_entry = tk.Entry(self)
+        self.baud_entry.pack()
 
-        self.connect_button = tk.Button(parent, text="Connect", command=connect_func)
+        self.connect_button = tk.Button(self, text="Connect", command=connect_func)
         self.connect_button.bind('<Return>', connect_func)
-        self.connect_button.pack(padx=10, pady=5)
+        self.connect_button.pack()
     
     def get_port(self):
         return self.port_entry.get()
     def get_baud(self):
         return self.baud_entry.get()
+
+class Terminal(tk.Frame):
+    def __init__(self, parent, send_func):
+        super().__init__(parent)
+        self.text = tk.Text(self, state='disabled')
+        self.text.config(width=80, height=20, bg='black', fg='white')
+        self.text.place(x=0, y=0, relwidth=1, relheight=0.8)
+        
+        self.send_entry = tk.Entry(self, width=80)
+        self.send_entry.bind('<Return>', send_func)
+        self.send_entry.place(x=0, rely=0.8, relwidth=1, relheight=0.1)
+        
+    def log_message(self, message):
+        self.text.config(state='normal')
+        self.text.insert('end', message + '\n')
+        self.text.config(state='disabled')
+        self.text.see('end')
+    
+    def get_entry(self):
+        """NOTE: Clears entry after returns"""
+        data = self.send_entry.get()
+        self.send_entry.delete(0, 'end')
+        return data
+    
 
 class SerialThread(threading.Thread):
     def __init__(self, serial_port, baud_rate, data_queue):
@@ -69,7 +93,8 @@ class SerialApp:
     def __init__(self, root: tk.Tk):
         self.root = root
         self.root.title("App")
-
+        self.root.geometry("800x600")
+        
         self.data_queue = queue.Queue()
         self.serial_thread = None
 
@@ -79,14 +104,10 @@ class SerialApp:
     def setup_gui(self):
         
         self.serial_setup = SerialSetup(self.root, self.connect_serial)
-        self.serial_setup.pack(padx=10, pady=10)
+        self.serial_setup.place(x=0, y=0, relwidth=0.5, relheight=0.5)
 
-        self.terminal = tk.Text(self.root, state='disabled', width=80, height=20)
-        self.terminal.pack(padx=10, pady=10)
-
-        self.send_entry = tk.Entry(self.root)
-        self.send_entry.bind('<Return>', self.send_data)
-        self.send_entry.pack(padx=10, pady=10)
+        self.terminal = Terminal(self.root, self.send_data)
+        self.terminal.place(relx=0, rely=0.5, relwidth=0.5, relheight=0.5)
 
     def connect_serial(self, event=None):
         port = self.serial_setup.get_port()
@@ -107,8 +128,7 @@ class SerialApp:
         self.root.after(100, self.process_serial_data)
 
     def send_data(self, event=None):
-        data = self.send_entry.get()
-        self.send_entry.delete(0, 'end')
+        data = self.terminal.get_entry()
         if self.serial_thread and self.serial_thread.ser and self.serial_thread.ser.is_open:
             try:
                 self.serial_thread.ser.write(data.encode('utf-8'))
@@ -117,10 +137,7 @@ class SerialApp:
                 print(f"Serial write error: {e}")
 
     def log_message(self, message):
-        self.terminal.config(state='normal')
-        self.terminal.insert('end', message + '\n')
-        self.terminal.config(state='disabled')
-        self.terminal.see('end')
+        self.terminal.log_message(message)
 
     def on_closing(self):
         if self.serial_thread and self.serial_thread.running:
