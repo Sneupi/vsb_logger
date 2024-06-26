@@ -23,127 +23,159 @@ class ControlPair(tk.Frame):
     def set_led(self, on: bool):
         self.led.config(bg="light green" if on else "red")
 
+    def set_cmd(self, command):
+        """Set function called on button press"""
+        self.button.config(command=command)
+
 class SystemFrame(tk.Frame):
     """Column of system controls"""
     def __init__(self, master):
         super().__init__(master)
         
         self.run = ControlPair(self, button_text="Run")
-        self.run.button.config(command=self.__run)
+        self.run.set_cmd(lambda: print("Run: Command not set"))
         self.run.place(relx=0, rely=0, relwidth=1, relheight=0.14)
 
         self.stop = ControlPair(self, button_text="Stop")
-        self.stop.button.config(command=self.__stop)
+        self.stop.set_cmd(lambda: print("Stop: Command not set"))
         self.stop.place(relx=0, rely=0.14, relwidth=1, relheight=0.14)
 
         self.balance = ControlPair(self, button_text="Balance")
-        self.balance.button.config(command=self.__balance)
+        self.balance.set_cmd(lambda: print("Balance: Command not set"))
         self.balance.place(relx=0, rely=0.28, relwidth=1, relheight=0.14)
 
         self.extbus = ControlPair(self, button_text="ExtBus")
-        self.extbus.button.config(command=self.__extbus)
+        self.extbus.set_cmd(lambda: print("ExtBus: Command not set"))
         self.extbus.place(relx=0, rely=0.42, relwidth=1, relheight=0.14)
 
         self.mq_dump = ControlPair(self, button_text="MQ Dump")
-        self.mq_dump.button.config(command=self.__mq_dump)
+        self.mq_dump.set_cmd(lambda: print("MQ Dump: Command not set"))
         self.mq_dump.place(relx=0, rely=0.56, relwidth=1, relheight=0.14)
 
         self.cp_lock = ControlPair(self, button_text="CP Lock")
-        self.cp_lock.button.config(command=self.__cp_lock)
+        self.cp_lock.set_cmd(lambda: print("CP Lock: Command not set"))
         self.cp_lock.place(relx=0, rely=0.70, relwidth=1, relheight=0.14)
 
         self.connect = ControlPair(self, button_text="Connect")
-        self.connect.button.config(command=self.__connect)
+        self.connect.set_cmd(lambda: print("Connect: Command not set"))
         self.connect.place(relx=0, rely=0.84, relwidth=1, relheight=0.14)
 
-    def __run(self):
-        # TODO: Run button action
-        print("Run button clicked")
-
-    def __stop(self):
-        # TODO: Stop button action
-        print("Stop button clicked")
-
-    def __balance(self):
-        # TODO: Balance button action
-        print("Balance button clicked")
-
-    def __extbus(self):
-        # TODO: ExtBus button action
-        print("ExtBus button clicked")
-
-    def __mq_dump(self):
-        # TODO: MQ Dump button action
-        print("MQ Dump button clicked")
-
-    def __cp_lock(self):
-        # TODO: CP Lock button action
-        print("CP Lock button clicked")
-
-    def __connect(self):
-        # TODO: Connect button action
-        print("Connect button clicked")        
-
+    def set_button_command(self, button_name, command):
+        """Set the command for a specific button
+        
+        Valid button names: run, stop, balance, 
+        extbus, mq dump, cp lock, connect"""
+        button_name = button_name.lower()
+        if button_name == "run":
+            self.run.set_cmd(command)
+        elif button_name == "stop":
+            self.stop.set_cmd(command)
+        elif button_name == "balance":
+            self.balance.set_cmd(command)
+        elif button_name == "extbus":
+            self.extbus.set_cmd(command)
+        elif button_name == "mq dump":
+            self.mq_dump.set_cmd(command)
+        elif button_name == "cp lock":
+            self.cp_lock.set_cmd(command)
+        elif button_name == "connect":
+            self.connect.set_cmd(command)
+            
+    def set_led(self, led_name, is_on: bool):
+        """Set the state of a specific LED
+        
+        Valid LED names: run, stop, balance, 
+        extbus, mq dump, cp lock, connect"""
+        led_name = led_name.lower()
+        if led_name == "run":
+            self.run.set_led(is_on)
+        elif led_name == "stop":
+            self.stop.set_led(is_on)
+        elif led_name == "balance":
+            self.balance.set_led(is_on)
+        elif led_name == "extbus":
+            self.extbus.set_led(is_on)
+        elif led_name == "mq dump":
+            self.mq_dump.set_led(is_on)
+        elif led_name == "cp lock":
+            self.cp_lock.set_led(is_on)
+        elif led_name == "connect":
+            self.connect.set_led(is_on)
+            
 class DiagnosticFrame(tk.Frame):
     """Column of diagnostic controls"""
     def __init__(self, master):
         super().__init__(master)
         
         self.debug = ControlPair(self, button_text="Debug")
-        self.debug.button.config(command=self.__debug)
+        self.debug.set_cmd(lambda: print("Debug: Command not set"))
         self.debug.place(relx=0, rely=0, relwidth=1, relheight=0.14)
 
         self.debug2 = ControlPair(self, button_text="Debug2")
-        self.debug2.button.config(command=self.__debug2)
+        self.debug2.set_cmd(lambda: print("Debug2: Command not set"))
         self.debug2.place(relx=0, rely=0.14, relwidth=1, relheight=0.14)
 
         self.trace = ControlPair(self, button_text="Trace")
-        self.trace.button.config(command=self.__trace)
+        self.trace.set_cmd(lambda: print("Trace: Command not set"))
         self.trace.place(relx=0, rely=0.28, relwidth=1, relheight=0.14)
 
         self.trace2 = ControlPair(self, button_text="Trace2")
-        self.trace2.button.config(command=self.__trace2)
+        self.trace2.set_cmd(lambda: print("Trace2: Command not set"))
         self.trace2.place(relx=0, rely=0.42, relwidth=1, relheight=0.14)
 
         self.info = ControlPair(self, button_text="Info")
-        self.info.button.config(command=self.__info)
+        self.info.set_cmd(lambda: print("Info: Command not set"))
         self.info.place(relx=0, rely=0.56, relwidth=1, relheight=0.14)
 
         self.error = ControlPair(self, button_text="Error")
-        self.error.button.config(command=self.__error)
+        self.error.set_cmd(lambda: print("Error: Command not set"))
         self.error.place(relx=0, rely=0.70, relwidth=1, relheight=0.14)
 
         self.log_cpi = ControlPair(self, button_text="Log CPI")
-        self.log_cpi.button.config(command=self.__log_cpi)
+        self.log_cpi.set_cmd(lambda: print("Log CPI: Command not set"))
         self.log_cpi.place(relx=0, rely=0.84, relwidth=1, relheight=0.14)
 
-    def __debug(self):
-        # TODO: Debug button action
-        print("Debug button clicked")
-
-    def __debug2(self):
-        # TODO: Debug2 button action
-        print("Debug2 button clicked")
-
-    def __trace(self):
-        # TODO: Trace button action
-        print("Trace button clicked")
-
-    def __trace2(self):
-        # TODO: Trace2 button action
-        print("Trace2 button clicked")
-
-    def __info(self):
-        # TODO: Info button action
-        print("Info button clicked")
-
-    def __error(self):
-        # TODO: Error button action
-        print("Error button clicked")
-
-    def __log_cpi(self):
-        # TODO: Log CPI button action
-        print("Log CPI button clicked")
+    def set_button_command(self, button_name, command):
+        """Set the command for a specific button
+        
+        Valid button names: debug, debug2, trace, 
+        trace2, info, error, log cpi"""
+        button_name = button_name.lower()
+        if button_name == "debug":
+            self.debug.set_cmd(command)
+        elif button_name == "debug2":
+            self.debug2.set_cmd(command)
+        elif button_name == "trace":
+            self.trace.set_cmd(command)
+        elif button_name == "trace2":
+            self.trace2.set_cmd(command)
+        elif button_name == "info":
+            self.info.set_cmd(command)
+        elif button_name == "error":
+            self.error.set_cmd(command)
+        elif button_name == "log cpi":
+            self.log_cpi.set_cmd(command)
+            
+    def set_led(self, led_name, is_on: bool):
+        """Set the state of a specific LED
+        
+        Valid LED names: debug, debug2, trace, 
+        trace2, info, error, log cpi"""
+        led_name = led_name.lower()
+        if led_name == "debug":
+            self.debug.set_led(is_on)
+        elif led_name == "debug2":
+            self.debug2.set_led(is_on)
+        elif led_name == "trace":
+            self.trace.set_led(is_on)
+        elif led_name == "trace2":
+            self.trace2.set_led(is_on)
+        elif led_name == "info":
+            self.info.set_led(is_on)
+        elif led_name == "error":
+            self.error.set_led(is_on)
+        elif led_name == "log cpi":
+            self.log_cpi.set_led(is_on)
 
 class StatePair(tk.Frame):
     """Frame with a label and a readout field"""
@@ -261,7 +293,7 @@ class ControlsFrame(tk.Frame):
  
 class SerialSetup(tk.Frame):
     """User interface for setting up serial connection"""
-    def __init__(self, parent, connect_func):
+    def __init__(self, parent):
         super().__init__(parent)
         
         self.port_label = tk.Label(self, text="Port:")
@@ -282,10 +314,6 @@ class SerialSetup(tk.Frame):
         self.baud_var.set(self.baud_options[4])
         self.baud_dropdown = ttk.Combobox(self, textvariable=self.baud_var, values=self.baud_options)
         self.baud_dropdown.pack(side='left', padx=5, pady=5)
-
-        self.connect_button = tk.Button(self, text="Connect", command=connect_func)
-        self.connect_button.bind('<Return>', connect_func)
-        self.connect_button.pack(side='right', padx=5, pady=5)
         
         self.refresh_button = tk.Button(self, text="Refresh", command=self.refresh_ports)
         self.refresh_button.pack(side='right', padx=5, pady=5)

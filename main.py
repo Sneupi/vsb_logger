@@ -21,16 +21,15 @@ class SerialThread(threading.Thread):
         try:
             self.ser = serial.Serial(self.serial_port, self.baud_rate)
             self.running = True
-            
-            filename = f"serial_log_{self.init_timestamp}.csv"
-            try:
-                self.logfile = open(filename, 'a', newline='')
-            except IOError as e:
-                print(f"Error opening file: {e}")
-                    
         except serial.SerialException as e:
             print(f"Error opening serial port: {e}")
             return
+        
+        filename = f"serial_log_{self.init_timestamp}.csv"
+        try:
+            self.logfile = open(filename, 'a', newline='')
+        except IOError as e:
+            print(f"Error opening file: {e}")
 
         while self.running:
             try:
@@ -64,6 +63,7 @@ class SerialApp:
         self.serial_thread = None
 
         self.setup_gui()
+        self.link_controls()
         self.root.after(100, self.process_serial_data)
 
     def setup_gui(self):
@@ -71,23 +71,37 @@ class SerialApp:
         self.controls = tkp.ControlsFrame(self.root)
         self.controls.place(relx=0, rely=0, relwidth=0.4, relheight=0.4)
         
-        self.serial_setup = tkp.SerialSetup(self.root, self.connect_serial)
+        self.serial_setup = tkp.SerialSetup(self.root)
         self.serial_setup.place(relx=0, rely=0.9, relwidth=0.4, relheight=0.1)
 
-        self.terminal = tkp.CLIFrame(self.root, self.send_data)
+        self.terminal = tkp.CLIFrame(self.root, self.send_entry)
         self.terminal.place(relx=0, rely=0.4, relwidth=0.4, relheight=0.5)
 
+    def link_controls(self):
+        self.controls.sys.set_button_command("run", lambda: self.send("RN"))
+        self.controls.sys.set_button_command("stop", lambda: self.send("ST"))
+        self.controls.sys.set_button_command("balance", lambda: self.send("AA"))  # TODO
+        self.controls.sys.set_button_command("extbus", lambda: self.send("AA"))  # TODO
+        self.controls.sys.set_button_command("mq dump", lambda: self.send("AA"))  # TODO
+        self.controls.sys.set_button_command("cp lock", lambda: self.send("AA"))  # TODO
+        self.controls.sys.set_button_command("connect", self.connect_serial)
+    
     def connect_serial(self, event=None):
         port = self.serial_setup.get_port()
         baud_rate = self.serial_setup.get_baud()
         
         if self.serial_thread and self.serial_thread.running:
             self.serial_thread.stop()
-
+            
+        self.controls.sys.set_led("connect", False) 
+        
         if port and baud_rate:
             self.serial_thread = SerialThread(port, int(baud_rate), self.data_queue)
             self.serial_thread.daemon = True
             self.serial_thread.start()
+        
+        self.root.after(250, lambda: self.controls.sys.set_led("connect", True) 
+                            if self.serial_thread.running else None)
 
     def process_serial_data(self):
         while not self.data_queue.empty():
@@ -96,8 +110,8 @@ class SerialApp:
             self.terminal.insert(data)
         self.root.after(100, self.process_serial_data)
 
-    def send_data(self, event=None):
-        data = self.terminal.get_entry()
+    def send(self, data):
+        data = data.strip() + '\n'
         if self.serial_thread and self.serial_thread.ser and self.serial_thread.ser.is_open:
             try:
                 self.serial_thread.ser.write(data.encode('utf-8'))
@@ -105,6 +119,12 @@ class SerialApp:
                 self.terminal.insert(data)
             except serial.SerialException as e:
                 print(f"Serial write error: {e}")
+    
+    def send_entry(self, event=None):
+        """Sending from terminal entry"""
+        data = self.terminal.get_entry()
+        self.send(data)
+        
 
     def log_message(self, message, is_rx):
         if self.serial_thread and self.serial_thread.logfile:
