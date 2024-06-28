@@ -5,6 +5,7 @@ import queue
 import tkpanels as tkp
 import time
 import csv
+import re
 
 import matplotlib
 matplotlib.use("TkAgg")
@@ -20,21 +21,19 @@ style.use("ggplot")
 f = Figure(figsize=(5,5), dpi=100)
 a = f.add_subplot(111)
 
+cv_data = [[] for _ in range(12)]  # 12 cells
 
 def animate(i):
-    # pullData = open("sampleText.txt","r").read()
-    # dataList = pullData.split('\n')
-    # xList = []
-    # yList = []
-    # for eachLine in dataList:
-    #     if len(eachLine) > 1:
-    #         x, y = eachLine.split(',')
-    #         xList.append(int(x))
-    #         yList.append(int(y))
-
-    # a.clear()
-    # a.plot(xList, yList)
-    pass # TODO implement plot animation
+    global cv_data
+    a.clear()
+    a.set_title("Cell Voltage")
+    a.set_xlabel("Uptime (as minutes)")
+    a.set_ylabel("Raw ADC")
+    for cell in range(12):
+        x = [x[0] for x in cv_data[cell]]
+        y = [y[1] for y in cv_data[cell]]
+        a.plot(x, y, label=f"Ch{cell+1}")
+    a.legend()
 
 class SerialThread(threading.Thread):
     def __init__(self, serial_port, baud_rate, data_queue):
@@ -191,6 +190,13 @@ class SerialApp(tk.Tk):
             diag.set_led("error", False)
         # log cpi  # TODO log cpi
         
+    def append_cv_data(self, data: str):
+        """If string is valid CV data, append to cv_data"""
+        global cv_data
+        if "DBG CV" in data:
+            tstamp, ch, val = [int(_) for _ in re.findall(r'\d+', data)[-3:]]
+            tstamp = tstamp / 60000  # ms to minutes
+            cv_data[ch - 1].append((tstamp, val))
             
     def link_controls(self):
         # FIXME: really unsophistocated, but it works
@@ -270,6 +276,7 @@ class SerialApp(tk.Tk):
         while not self.data_queue.empty():
             data = self.data_queue.get()
             self.update_controls(data)
+            self.append_cv_data(data)
             self.terminal.insert(data)
         self.after(100, self.process_serial_data)
 
