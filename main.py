@@ -129,8 +129,71 @@ class SerialApp(tk.Tk):
         canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
         canvas._tkcanvas.place(relx=0.4, rely=0, relwidth=0.6, relheight=1)
 
-    def link_controls(self):
+    def update_controls(self, data: str):
+        # FIXME: I can see this getting out 
+        # of hand quickly with VSB firmware changes.
+        # Also dislike how unsophistocated it is
+        """Update controlpair states based on incoming data"""
+        sys = self.controls.sys
+        diag = self.controls.diag
+        # run/stop
+        if "RN:" in data:
+            sys.set_led("run", True)
+            sys.set_led("stop", False)
+            
+        elif "ST:" in data:
+            sys.set_led("run", False)
+            sys.set_led("stop", True)
+        # balance
+        elif "EB:" in data and "enabled" in data:
+            sys.set_led("balance", True)
+            
+        elif "DB:" in data and "disabled" in data:
+            sys.set_led("balance", False)
+        # extbus
+        elif "XE:" in data and "on" in data:
+            sys.set_led("extbus", True)
+            
+        elif "XD:" in data and "off" in data:
+            sys.set_led("extbus", False)
+        # mq dump
+        elif "EQ:" in data and "enabled" in data:
+            sys.set_led("mq dump", True)
+            
+        elif "DQ:" in data and "disabled" in data:
+            sys.set_led("mq dump", False)
+        # cp lock  # TODO cp lock
+        # debug
+        elif "ED:" in data and "enabled" in data:
+            diag.set_led("debug", True)
         
+        elif "DD:" in data and "disabled" in data:
+            diag.set_led("debug", False)
+        # debug2
+        elif "E2:" in data and "enabled" in data:
+            diag.set_led("debug2", True)
+        
+        elif "D2:" in data and "disabled" in data:
+            diag.set_led("debug2", False)
+        # trace
+        elif "TA:" in data and "active" in data:
+            diag.set_led("trace", True)
+        
+        elif "DT:" in data and "disabled" in data:
+            diag.set_led("trace", False)
+        # trace2  # TODO trace2
+        # info  # TODO info
+        # error
+        elif "EE:" in data and "enabled" in data:
+            diag.set_led("error", True)
+        
+        elif "DE:" in data and "disabled" in data:
+            diag.set_led("error", False)
+        # log cpi  # TODO log cpi
+        
+            
+    def link_controls(self):
+        # FIXME: really unsophistocated, but it works
         def _balance():
             ctrl = self.controls.sys.balance
             self.send("EB" if not ctrl.is_on else "DB")
@@ -206,6 +269,7 @@ class SerialApp(tk.Tk):
     def process_serial_data(self):
         while not self.data_queue.empty():
             data = self.data_queue.get()
+            self.update_controls(data)
             self.terminal.insert(data)
         self.after(100, self.process_serial_data)
 
