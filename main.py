@@ -34,7 +34,7 @@ def animate(i):
 
     # a.clear()
     # a.plot(xList, yList)
-    pass # TODO
+    pass # TODO implement plot animation
 
 class SerialThread(threading.Thread):
     def __init__(self, serial_port, baud_rate, data_queue):
@@ -109,7 +109,6 @@ class SerialApp(tk.Tk):
         self.terminal = tkp.CLIFrame(self, self.send_entry)
         self.terminal.place(relx=0, rely=0.4, relwidth=0.4, relheight=0.5)
         
-        # TODO tweak plot
         canvas = FigureCanvasTkAgg(f, self)
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
@@ -145,7 +144,7 @@ class SerialApp(tk.Tk):
             self.send("EQ" if ctrl.is_on else "DQ")
             
         def _cp_lock():
-            print("CP lock not implemented yet")  # TODO
+            print("CP lock not implemented yet")  # TODO cp lock button
             
         def _debug():
             ctrl = self.controls.diag.debug
@@ -163,10 +162,10 @@ class SerialApp(tk.Tk):
             self.send("TA" if ctrl.is_on else "DT")
 
         def _trace2():
-            print("Trace2 not implemented yet")  # TODO
+            print("Trace2 not implemented yet")  # TODO trace2 button
         
         def _info():
-            print("Info not implemented yet")  # TODO; vague what this does
+            print("Info not implemented yet")  # TODO; info button is vague
         
         def _error():
             ctrl = self.controls.diag.error
