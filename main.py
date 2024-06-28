@@ -130,51 +130,33 @@ class SerialApp(tk.Tk):
         canvas._tkcanvas.place(relx=0.4, rely=0, relwidth=0.6, relheight=1)
 
     def link_controls(self):
-        # FIXME: indiciators not necessarily 
-        # reflective of device state, but of last command sent 
-        
-        def _run():
-            self.controls.sys.set_led("run", True)
-            self.controls.sys.set_led("stop", False)
-            self.send("RN")
-        
-        def _stop():
-            self.controls.sys.set_led("run", False)
-            self.controls.sys.set_led("stop", True)
-            self.send("ST")
         
         def _balance():
             ctrl = self.controls.sys.balance
-            ctrl.toggle_led()
-            self.send("EB" if ctrl.is_on else "DB")
+            self.send("EB" if not ctrl.is_on else "DB")
         
         def _extbus():
             ctrl = self.controls.sys.extbus
-            ctrl.toggle_led()
-            self.send("XE" if ctrl.is_on else "XD")
+            self.send("XE" if not ctrl.is_on else "XD")
             
         def _mq_dump():
             ctrl = self.controls.sys.mq_dump
-            ctrl.toggle_led()
-            self.send("EQ" if ctrl.is_on else "DQ")
+            self.send("EQ" if not ctrl.is_on else "DQ")
             
         def _cp_lock():
             print("CP lock not implemented yet")  # TODO cp lock button
             
         def _debug():
             ctrl = self.controls.diag.debug
-            ctrl.toggle_led()
-            self.send("ED" if ctrl.is_on else "DD")
+            self.send("ED" if not ctrl.is_on else "DD")
             
         def _debug2():
             ctrl = self.controls.diag.debug2
-            ctrl.toggle_led()
-            self.send("E2" if ctrl.is_on else "D2")
+            self.send("E2" if not ctrl.is_on else "D2")
         
         def _trace():
             ctrl = self.controls.diag.trace
-            ctrl.toggle_led()
-            self.send("TA" if ctrl.is_on else "DT")
+            self.send("TA" if not ctrl.is_on else "DT")
 
         def _trace2():
             print("Trace2 not implemented yet")  # TODO trace2 button
@@ -184,15 +166,14 @@ class SerialApp(tk.Tk):
         
         def _error():
             ctrl = self.controls.diag.error
-            ctrl.toggle_led()
-            self.send("EE" if ctrl.is_on else "DE")
+            self.send("EE" if not ctrl.is_on else "DE")
         
         def _log_cpi():
             print("Log CPI not implemented yet (logs currently always on)")
             # TODO: toggle CPI logging
                 
-        self.controls.sys.set_button_command("run", _run)
-        self.controls.sys.set_button_command("stop", _stop)
+        self.controls.sys.set_button_command("run", lambda: self.send("RN"))
+        self.controls.sys.set_button_command("stop", lambda: self.send("ST"))
         self.controls.sys.set_button_command("balance", _balance)
         self.controls.sys.set_button_command("extbus", _extbus)
         self.controls.sys.set_button_command("mq dump", _mq_dump)
