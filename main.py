@@ -198,16 +198,14 @@ class SerialApp(tk.Tk):
         
         if self.serial_thread and self.serial_thread.running:
             self.serial_thread.stop()
-            
-        self.controls.sys.set_led("connect", False) 
-        
+
         if port and baud_rate:
             self.serial_thread = SerialThread(port, int(baud_rate), self.data_queue)
             self.serial_thread.daemon = True
             self.serial_thread.start()
         
-        self.after(250, lambda: self.controls.sys.set_led("connect", True) 
-                            if self.serial_thread.running else None)
+        self.after(250, lambda: self.controls.sys
+                   .set_led("connect", self.serial_thread.running))
 
     def process_serial_data(self):
         while not self.data_queue.empty():
