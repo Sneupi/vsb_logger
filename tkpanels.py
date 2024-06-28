@@ -13,7 +13,7 @@ class ControlPair(tk.Frame):
     """Frame with a button and an indicator"""
     def __init__(self, master, button_text="N/A"):
         super().__init__(master)
-        
+        self.is_on = False
         self.led = tk.Label(self, width=2, relief="solid", borderwidth=1)
         self.set_led(False)
         self.button = tk.Button(self, text=button_text)
@@ -22,6 +22,10 @@ class ControlPair(tk.Frame):
     
     def set_led(self, on: bool):
         self.led.config(bg="light green" if on else "red")
+        self.is_on = on
+    
+    def toggle_led(self):
+        self.set_led(not self.is_on)
 
     def set_cmd(self, command):
         """Set function called on button press"""
