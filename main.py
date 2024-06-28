@@ -65,6 +65,7 @@ class SerialThread(threading.Thread):
             try:
                 if self.ser.in_waiting:
                     data = self.ser.readline().decode('utf-8').strip()
+                    self.__log(data, is_rx=True)
                     self.data_queue.put(data)
             except serial.SerialException as e:
                 print(f"Serial read error: {e}")
@@ -82,6 +83,20 @@ class SerialThread(threading.Thread):
         if self.logfile:
             self.logfile.close()
 
+    def connected(self):
+        return self.ser and self.ser.is_open
+    
+    def write(self, data: str):
+        data = data.strip() + '\n'
+        ret = self.ser.write(data.encode('utf-8'))
+        self.__log(data.strip(), is_rx=False)
+        return ret
+                
+    def __log(self, message, is_rx):
+        if self.logfile:
+            writer = csv.writer(self.logfile)
+            writer.writerow(['RX' if is_rx else 'TX', message])
+            
 class SerialApp(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
@@ -210,30 +225,18 @@ class SerialApp(tk.Tk):
     def process_serial_data(self):
         while not self.data_queue.empty():
             data = self.data_queue.get()
-            self.log_message(data, True)
             self.terminal.insert(data)
         self.after(100, self.process_serial_data)
 
-    def send(self, data):
-        data = data.strip() + '\n'
-        if self.serial_thread and self.serial_thread.ser and self.serial_thread.ser.is_open:
-            try:
-                self.serial_thread.ser.write(data.encode('utf-8'))
-                self.log_message(data.strip(), False)
+    def send(self, data: str):
+        if self.serial_thread and self.serial_thread.connected():
+            if self.serial_thread.write(data):  # Success
                 self.terminal.insert(data)
-            except serial.SerialException as e:
-                print(f"Serial write error: {e}")
     
     def send_entry(self, event=None):
         """Sending from terminal entry"""
         data = self.terminal.get_entry()
         self.send(data)
-        
-
-    def log_message(self, message, is_rx):
-        if self.serial_thread and self.serial_thread.logfile:
-            writer = csv.writer(self.serial_thread.logfile)
-            writer.writerow(['RX' if is_rx else 'TX', message])
 
     def on_closing(self):
         if self.serial_thread and self.serial_thread.running:
