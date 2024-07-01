@@ -117,6 +117,7 @@ class SerialApp(tk.Tk):
         
         self.controls = tkp.ControlsFrame(self)
         self.controls.place(relx=0, rely=0, relwidth=0.4, relheight=0.4)
+        self.controls.diag.set_led("log cpi", True)  # FIXME: logging always on
         
         self.serial_setup = tkp.SerialSetup(self)
         self.serial_setup.place(relx=0, rely=0.9, relwidth=0.4, relheight=0.1)
