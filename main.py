@@ -3,7 +3,7 @@ import threading
 import serial
 import queue
 import tkpanels as tkp
-import time
+import datetime
 import csv
 import re
 
@@ -43,7 +43,7 @@ class SerialThread(threading.Thread):
         self.data_queue = data_queue
         self.running = False
         self.ser = None
-        self.init_timestamp = time.strftime("%Y_%m_%d_%H%M%S", time.localtime())
+        self.init_timestamp = datetime.datetime.now().strftime("%Y_%m_%d_%H%M%S")
         self.logfile = None
         
     def run(self):
@@ -94,7 +94,8 @@ class SerialThread(threading.Thread):
     def __log(self, message, is_rx):
         if self.logfile:
             writer = csv.writer(self.logfile)
-            writer.writerow(['RX' if is_rx else 'TX', message])
+            tstamp = str(datetime.datetime.now())
+            writer.writerow([tstamp, 'RX' if is_rx else 'TX', message])
             
 class SerialApp(tk.Tk):
     def __init__(self, *args, **kwargs):
