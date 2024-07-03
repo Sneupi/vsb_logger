@@ -35,6 +35,36 @@ def animate(i):
         a.plot(x, y, label=f"Ch{cell+1}")
     a.legend()
 
+class SerialLogger:
+    def __init__(self):
+        self.logfile = None
+        
+    def open(self, filename):
+        self.close()  # If open, close
+        try:
+            self.logfile = open(filename, 'a', newline='')
+        except IOError as e:
+            self.logfile = None
+            raise e
+            
+    def generic_filename(self):
+        """Generic filename with current datetime"""
+        return f"serial_log_{datetime.datetime.now().\
+            strftime('%Y_%m_%d_%H%M%S')}.csv"
+            
+    def close(self):
+        if self.logfile:
+            self.logfile.close()
+            self.logfile = None
+            
+    def log(self, message, is_rx):
+        if self.logfile:
+            writer = csv.writer(self.logfile)
+            tstamp = str(datetime.datetime.now())
+            writer.writerow([tstamp, 'RX' if is_rx else 'TX', message])
+        else:
+            raise IOError("Log file not open")
+
 class SerialThread(threading.Thread):
     def __init__(self, serial_port, baud_rate, data_queue):
         super().__init__()
