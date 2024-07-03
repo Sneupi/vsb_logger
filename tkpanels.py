@@ -250,7 +250,7 @@ class CLIFrame(tk.Frame):
         self.out_txt.config(state=tk.DISABLED)
         self.out_txt.place(relx=0, rely=0, relwidth=1, relheight=0.8)
         
-        self.clr_button = tk.Button(self, text="Clear", command=self.clear)
+        self.clr_button = tk.Button(self, text="Clear Terminal", command=self.clear)
         self.clr_button.place(relx=0.66, rely=0.9, relwidth=0.33, relheight=0.1)
         
         self.is_scroll = True
@@ -321,7 +321,7 @@ class SerialSetup(tk.Frame):
         self.baud_dropdown = ttk.Combobox(self, textvariable=self.baud_var, values=self.baud_options)
         self.baud_dropdown.pack(side='left', padx=5, pady=5)
         
-        self.refresh_button = tk.Button(self, text="Refresh", command=self.refresh_ports)
+        self.refresh_button = tk.Button(self, text="Refresh Ports", command=self.refresh_ports)
         self.refresh_button.pack(side='right', padx=5, pady=5)
     
     def get_available_ports(self):
