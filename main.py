@@ -96,7 +96,7 @@ class SerialThread(threading.Thread):
                 else:
                     time.sleep(0.1)  # Prevent CPU hogging
             except serial.SerialException as e:
-                print(f"Serial read error: {e}")
+                pass  # FIXME hacked to ignore ClearCommError. serial re-connect needs work
             except UnicodeDecodeError as e:
                 print(f"Unicode error: {e}")
 
