@@ -74,11 +74,8 @@ class SerialThread(threading.Thread):
     def connect_serial(self, port, baud):
         if self.connected():
             self.ser.close()
-        try:
-            self.ser = serial.Serial(port, baud)
-        except serial.SerialException as e:
             self.ser = None
-            raise e
+        self.ser = serial.Serial(port, baud)
         
     def run(self):
         try:
@@ -102,11 +99,8 @@ class SerialThread(threading.Thread):
 
     def stop(self):
         self.running = False
-        if self.ser and self.ser.is_open:
-            try:
-                self.ser.close()
-            except serial.SerialException as e:
-                print(f"Error closing serial port: {e}")
+        if self.connected():
+            self.ser.close()
         self.logger.close()
 
     def connected(self):
