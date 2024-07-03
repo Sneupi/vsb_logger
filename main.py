@@ -73,8 +73,7 @@ class SerialThread(threading.Thread):
         self.data_queue = data_queue
         self.running = False
         self.ser = None
-        self.init_timestamp = datetime.datetime.now().strftime("%Y_%m_%d_%H%M%S")
-        self.logfile = None
+        self.logger = SerialLogger()
         
     def run(self):
         try:
@@ -84,11 +83,10 @@ class SerialThread(threading.Thread):
             print(f"Error opening serial port: {e}")
             return
         
-        filename = f"serial_log_{self.init_timestamp}.csv"
         try:
-            self.logfile = open(filename, 'a', newline='')
-        except IOError as e:
-            print(f"Error opening file: {e}")
+            self.logger.open(self.logger.generic_filename())
+        except Exception as e:
+            print(e)
 
         while self.running:
             try:
@@ -109,8 +107,7 @@ class SerialThread(threading.Thread):
                 self.ser.close()
             except serial.SerialException as e:
                 print(f"Error closing serial port: {e}")
-        if self.logfile:
-            self.logfile.close()
+        self.logger.close()
 
     def connected(self):
         return self.ser and self.ser.is_open
@@ -122,10 +119,10 @@ class SerialThread(threading.Thread):
         return ret
                 
     def __log(self, message, is_rx):
-        if self.logfile:
-            writer = csv.writer(self.logfile)
-            tstamp = str(datetime.datetime.now())
-            writer.writerow([tstamp, 'RX' if is_rx else 'TX', message])
+        try:
+            self.logger.log(message, is_rx)
+        except IOError as e:
+            print(e)
             
 class SerialApp(tk.Tk):
     def __init__(self, *args, **kwargs):
