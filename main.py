@@ -6,6 +6,7 @@ import tkpanels as tkp
 import datetime
 import csv
 import re
+import time
 
 import matplotlib
 matplotlib.use("TkAgg")
@@ -63,34 +64,37 @@ class CSVLogger:
             self.log_serial(message, is_rx)
 
 class SerialThread(threading.Thread):
-    def __init__(self, serial, baud, data_queue):
+    def __init__(self, data_queue):
         super().__init__()
-        self.port = serial
-        self.baud = baud
         self.data_queue = data_queue
         self.running = False
         self.ser = None
         self.logger = CSVLogger()
         
-    def run(self):
+    def connect_serial(self, port, baud):
+        if self.connected():
+            self.ser.close()
         try:
-            self.ser = serial.Serial(self.port, self.baud)
-            self.running = True
+            self.ser = serial.Serial(port, baud)
         except serial.SerialException as e:
-            print(f"Error opening serial port: {e}")
-            return
+            self.ser = None
+            raise e
         
+    def run(self):
         try:
             self.logger.open(self.logger.generic_filename())
         except Exception as e:
             print(e)
-
+            
+        self.running = True
         while self.running:
             try:
-                if self.ser.in_waiting:
+                if self.connected() and self.ser.in_waiting:
                     data = self.ser.readline().decode('utf-8').strip()
                     self.logger.log_serial(data, is_rx=True)
                     self.data_queue.put(data)
+                else:
+                    time.sleep(0.1)  # Prevent CPU hogging
             except serial.SerialException as e:
                 print(f"Serial read error: {e}")
                 self.running = False
@@ -285,12 +289,16 @@ class SerialApp(tk.Tk):
             self.serial_thread.stop()
 
         if port and baud_rate:
-            self.serial_thread = SerialThread(port, int(baud_rate), self.data_queue)
+            self.serial_thread = SerialThread(self.data_queue)
             self.serial_thread.daemon = True
+            try:
+                self.serial_thread.connect_serial(port, int(baud_rate))
+            except serial.SerialException as e:
+                print(f"Serial error: {e}")
             self.serial_thread.start()
         
         self.after(250, lambda: self.controls.sys
-                   .set_led("connect", self.serial_thread.running))
+                   .set_led("connect", self.serial_thread.connected()))
 
     def process_serial_data(self):
         while not self.data_queue.empty():
