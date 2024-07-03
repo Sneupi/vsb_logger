@@ -138,7 +138,7 @@ class SerialApp(tk.Tk):
         self.setup_gui()
         self.link_controls()
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
-        self.after(100, self.process_serial_data)
+        self.after(100, self.__process_serial_data)
 
     def setup_gui(self):
         
@@ -316,7 +316,8 @@ class SerialApp(tk.Tk):
                 print(f"Serial connect error: {e}")
             self.controls.sys.set_led("connect", self.serial_thread.connected())
 
-    def process_serial_data(self):
+    def __process_serial_data(self):
+        #FIXME: using recursive after(), major hack
         q = self.serial_thread.txn_queue
         while not q.empty():
             direction, data = q.get()
@@ -324,7 +325,7 @@ class SerialApp(tk.Tk):
                 self.update_controls(data)
                 self.append_cv_data(data)
             self.terminal.insert(data)
-        self.after(100, self.process_serial_data)
+        self.after(100, self.__process_serial_data)
 
     def send(self, data: str):
         if self.serial_thread.connected():
