@@ -41,6 +41,8 @@ class CSVLogger:
         self.logfile = None
         
     def open(self, filename):
+        if not filename.endswith('.csv'):
+            raise ValueError("Filename must end with .csv")
         self.close()  # If open, close
         self.logfile = open(filename, 'a', newline='')
             
@@ -48,6 +50,9 @@ class CSVLogger:
         if self.logfile:
             self.logfile.close()
         self.logfile = None
+    
+    def ready(self):
+        return self.logfile is not None
             
     def generic_filename(self):
         """Generic filename with current datetime"""
@@ -60,8 +65,7 @@ class CSVLogger:
             tstamp = str(datetime.datetime.now())
             writer.writerow([tstamp, 'RX' if is_rx else 'TX', message])
         else:
-            self.open(self.generic_filename())  # Save to generic file
-            self.log_serial(message, is_rx)
+            raise IOError("Log file not open")
 
 class SerialThread(threading.Thread):
     def __init__(self):
@@ -92,7 +96,7 @@ class SerialThread(threading.Thread):
             try:
                 if self.connected() and self.ser.in_waiting:
                     data = self.ser.readline().decode('utf-8').strip()
-                    if self.logging:
+                    if self.logging and self.logger.ready():
                         self.logger.log_serial(data, is_rx=True)
                     self.txn_queue.put(('RX', data))
                 else:
@@ -114,7 +118,7 @@ class SerialThread(threading.Thread):
     def write(self, data: str):
         data = data.strip() + '\n'
         ret = self.ser.write(data.encode('utf-8'))
-        if self.logging:
+        if self.logging and self.logger.ready():
             self.logger.log_serial(data.strip(), is_rx=False)
         self.txn_queue.put(('TX', data.strip()))
         return ret
@@ -270,10 +274,13 @@ class SerialApp(tk.Tk):
             thd = self.serial_thread
             
             ctrl.toggle_led()
+            if ctrl.is_on:
+                try:
+                    thd.set_logfile(self.filebrowser.get_path())
+                except ValueError as e:
+                    ctrl.set_led(False)
+                    print(f"Log file error: {e}")
             thd.set_logging(ctrl.is_on)
-            # if ctrl.is_on:
-                # FIXME: get filename from gui
-                # thd.set_logfile(thd.logger.generic_filename())
                 
         self.controls.sys.set_button_command("run", lambda: self.send("RN"))
         self.controls.sys.set_button_command("stop", lambda: self.send("ST"))
