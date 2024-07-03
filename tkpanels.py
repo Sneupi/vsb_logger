@@ -56,9 +56,9 @@ class SystemFrame(tk.Frame):
         self.mq_dump.set_cmd(lambda: print("MQ Dump: Command not set"))
         self.mq_dump.place(relx=0, rely=0.56, relwidth=1, relheight=0.14)
 
-        self.cp_lock = ControlPair(self, button_text="CP Lock")
-        self.cp_lock.set_cmd(lambda: print("CP Lock: Command not set"))
-        self.cp_lock.place(relx=0, rely=0.70, relwidth=1, relheight=0.14)
+        self.show_dn = ControlPair(self, button_text="Show DN")
+        self.show_dn.set_cmd(lambda: print("Show DN: Command not set"))
+        self.show_dn.place(relx=0, rely=0.70, relwidth=1, relheight=0.14)
 
         self.connect = ControlPair(self, button_text="Connect")
         self.connect.set_cmd(lambda: print("Connect: Command not set"))
@@ -68,7 +68,7 @@ class SystemFrame(tk.Frame):
         """Set the command for a specific button
         
         Valid button names: run, stop, balance, 
-        extbus, mq dump, cp lock, connect"""
+        extbus, mq dump, show dn, connect"""
         button_name = button_name.lower()
         if button_name == "run":
             self.run.set_cmd(command)
@@ -80,8 +80,8 @@ class SystemFrame(tk.Frame):
             self.extbus.set_cmd(command)
         elif button_name == "mq dump":
             self.mq_dump.set_cmd(command)
-        elif button_name == "cp lock":
-            self.cp_lock.set_cmd(command)
+        elif button_name == "show dn":
+            self.show_dn.set_cmd(command)
         elif button_name == "connect":
             self.connect.set_cmd(command)
             
@@ -89,7 +89,7 @@ class SystemFrame(tk.Frame):
         """Set the state of a specific LED
         
         Valid LED names: run, stop, balance, 
-        extbus, mq dump, cp lock, connect"""
+        extbus, mq dump, show dn, connect"""
         led_name = led_name.lower()
         if led_name == "run":
             self.run.set_led(is_on)
@@ -101,8 +101,8 @@ class SystemFrame(tk.Frame):
             self.extbus.set_led(is_on)
         elif led_name == "mq dump":
             self.mq_dump.set_led(is_on)
-        elif led_name == "cp lock":
-            self.cp_lock.set_led(is_on)
+        elif led_name == "show dn":
+            self.show_dn.set_led(is_on)
         elif led_name == "connect":
             self.connect.set_led(is_on)
             

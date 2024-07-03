@@ -185,7 +185,11 @@ class SerialApp(tk.Tk):
             
         elif "DQ:" in data and "disabled" in data:
             sys.set_led("mq dump", False)
-        # cp lock  # TODO cp lock
+        # show dn
+        elif "SN:" in data and "-> ON" in data:
+            sys.set_led("show dn", True)
+        elif "SN:" in data and "-> OFF" in data:
+            sys.set_led("show dn", False)
         # debug
         elif "ED:" in data and "enabled" in data:
             diag.set_led("debug", True)
@@ -236,9 +240,6 @@ class SerialApp(tk.Tk):
             ctrl = self.controls.sys.mq_dump
             self.send("EQ" if not ctrl.is_on else "DQ")
             
-        def _cp_lock():
-            print("CP lock not implemented yet")  # TODO cp lock button
-            
         def _debug():
             ctrl = self.controls.diag.debug
             self.send("ED" if not ctrl.is_on else "DD")
@@ -276,7 +277,7 @@ class SerialApp(tk.Tk):
         self.controls.sys.set_button_command("balance", _balance)
         self.controls.sys.set_button_command("extbus", _extbus)
         self.controls.sys.set_button_command("mq dump", _mq_dump)
-        self.controls.sys.set_button_command("cp lock", _cp_lock)
+        self.controls.sys.set_button_command("show dn", lambda: self.send("SN"))
         self.controls.sys.set_button_command("connect", self.connect_serial)
         
         self.controls.diag.set_button_command("debug", _debug)
