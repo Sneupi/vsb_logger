@@ -49,8 +49,7 @@ class SerialLogger:
             
     def generic_filename(self):
         """Generic filename with current datetime"""
-        return f"serial_log_{datetime.datetime.now().\
-            strftime('%Y_%m_%d_%H%M%S')}.csv"
+        return f"serial_log_{datetime.datetime.now().strftime('%Y_%m_%d_%H%M%S')}.csv"
             
     def close(self):
         if self.logfile:
@@ -66,10 +65,10 @@ class SerialLogger:
             raise IOError("Log file not open")
 
 class SerialThread(threading.Thread):
-    def __init__(self, serial_port, baud_rate, data_queue):
+    def __init__(self, serial, baud, data_queue):
         super().__init__()
-        self.serial_port = serial_port
-        self.baud_rate = baud_rate
+        self.port = serial
+        self.baud = baud
         self.data_queue = data_queue
         self.running = False
         self.ser = None
@@ -77,7 +76,7 @@ class SerialThread(threading.Thread):
         
     def run(self):
         try:
-            self.ser = serial.Serial(self.serial_port, self.baud_rate)
+            self.ser = serial.Serial(self.port, self.baud)
             self.running = True
         except serial.SerialException as e:
             print(f"Error opening serial port: {e}")
