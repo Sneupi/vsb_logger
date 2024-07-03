@@ -68,6 +68,7 @@ class SerialThread(threading.Thread):
         super().__init__()
         self.data_queue = data_queue
         self.running = False
+        self.logging = False
         self.ser = None
         self.logger = CSVLogger()
         
@@ -77,18 +78,22 @@ class SerialThread(threading.Thread):
             self.ser = None
         self.ser = serial.Serial(port, baud)
         
+    def set_logfile(self, filename):
+        self.logger.open(filename)
+    
+    def set_logging(self, state):
+        self.logging = state
+        if not self.logging:
+            self.logger.close()
+        
     def run(self):
-        try:
-            self.logger.open(self.logger.generic_filename())
-        except Exception as e:
-            print(e)
-            
         self.running = True
         while self.running:
             try:
                 if self.connected() and self.ser.in_waiting:
                     data = self.ser.readline().decode('utf-8').strip()
-                    self.logger.log_serial(data, is_rx=True)
+                    if self.logging:
+                        self.logger.log_serial(data, is_rx=True)
                     self.data_queue.put(data)
                 else:
                     time.sleep(0.1)  # Prevent CPU hogging
@@ -109,7 +114,8 @@ class SerialThread(threading.Thread):
     def write(self, data: str):
         data = data.strip() + '\n'
         ret = self.ser.write(data.encode('utf-8'))
-        self.logger.log_serial(data.strip(), is_rx=False)
+        if self.logging:
+            self.logger.log_serial(data.strip(), is_rx=False)
         return ret
             
 class SerialApp(tk.Tk):
@@ -135,7 +141,6 @@ class SerialApp(tk.Tk):
         
         self.controls = tkp.ControlsFrame(self)
         self.controls.place(relx=0, rely=0, relwidth=0.4, relheight=0.4)
-        self.controls.diag.set_led("log cpi", True)  # FIXME: logging always on
         
         self.serial_setup = tkp.SerialSetup(self)
         self.serial_setup.place(relx=0, rely=0.9, relwidth=0.4, relheight=0.1)
@@ -258,8 +263,14 @@ class SerialApp(tk.Tk):
             self.send("EE" if not ctrl.is_on else "DE")
         
         def _log_cpi():
-            print("Log CPI not implemented yet (logs currently always on)")
-            # TODO: toggle CPI logging
+            ctrl = self.controls.diag.log_cpi
+            thd = self.serial_thread
+            
+            ctrl.toggle_led()
+            thd.set_logging(ctrl.is_on)
+            # if ctrl.is_on:
+                # FIXME: get filename from gui
+                # thd.set_logfile(thd.logger.generic_filename())
                 
         self.controls.sys.set_button_command("run", lambda: self.send("RN"))
         self.controls.sys.set_button_command("stop", lambda: self.send("ST"))
