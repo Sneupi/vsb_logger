@@ -241,21 +241,21 @@ class CLIFrame(tk.Frame):
         super().__init__(master)
         
         self.in_str = tk.StringVar()
-        self.in_str.set("[ENTER COMMAND HERE]")
         self.in_txt = tk.Entry(self, textvariable=self.in_str)
+        self.in_txt.config(border=5, relief="groove")
         self.in_txt.bind("<Return>", send_func)
-        self.in_txt.place(relx=0, rely=0.8, relwidth=1, relheight=0.1)
+        self.in_txt.place(relx=0, rely=0.8, relwidth=1, relheight=0.15)
         
         self.out_txt = tk.Text(self, bg="black", fg="white")
         self.out_txt.config(state=tk.DISABLED)
         self.out_txt.place(relx=0, rely=0, relwidth=1, relheight=0.8)
         
         self.clr_button = tk.Button(self, text="Clear Terminal", command=self.clear)
-        self.clr_button.place(relx=0.66, rely=0.9, relwidth=0.33, relheight=0.1)
+        self.clr_button.place(relx=0.66, rely=0.95, relwidth=0.33, relheight=0.05)
         
         self.is_scroll = True
         self.scroll_button = tk.Button(self, text="Scroll OFF", command=self.pause_scroll)
-        self.scroll_button.place(relx=0.33, rely=0.9, relwidth=0.33, relheight=0.1)
+        self.scroll_button.place(relx=0.33, rely=0.95, relwidth=0.33, relheight=0.05)
         
     def clear(self):
         """Clear the terminal"""
