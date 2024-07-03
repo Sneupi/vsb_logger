@@ -128,7 +128,7 @@ class SerialApp(tk.Tk):
         tk.Tk.__init__(self, *args, **kwargs)
 
         self.title("App")
-        self.geometry("1280x720")
+        self.geometry("1400x700")
         self.resizable(False, False)
         
         self.serial_thread = SerialThread()
@@ -143,21 +143,21 @@ class SerialApp(tk.Tk):
     def setup_gui(self):
         
         self.controls = tkp.ControlsFrame(self)
-        self.controls.place(relx=0, rely=0, relwidth=0.4, relheight=0.3)
+        self.controls.place(relx=0, rely=0, relwidth=0.45, relheight=0.3)
         
         self.filebrowser = tkp.FileBrowser(self)
-        self.filebrowser.place(relx=0, rely=0.3, relwidth=0.4, relheight=0.05)
+        self.filebrowser.place(relx=0, rely=0.3, relwidth=0.45, relheight=0.05)
                 
         self.serial_setup = tkp.SerialSetup(self)
-        self.serial_setup.place(relx=0, rely=0.95, relwidth=0.4, relheight=0.05)
+        self.serial_setup.place(relx=0, rely=0.95, relwidth=0.45, relheight=0.05)
 
         self.terminal = tkp.CLIFrame(self, self.send_entry)
-        self.terminal.place(relx=0.01, rely=0.36, relwidth=0.38, relheight=0.58)
+        self.terminal.place(relx=0.01, rely=0.36, relwidth=0.43, relheight=0.58)
         
         canvas = FigureCanvasTkAgg(f, self)
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
-        canvas._tkcanvas.place(relx=0.4, rely=0, relwidth=0.6, relheight=1)
+        canvas._tkcanvas.place(relx=0.45, rely=0, relwidth=0.55, relheight=1)
 
     def update_controls(self, data: str):
         # FIXME: I can see this getting out 
