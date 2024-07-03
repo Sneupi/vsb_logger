@@ -7,6 +7,7 @@ Purpose: Contains the classes for the GUI panels
 
 import tkinter as tk
 from tkinter import ttk
+from tkinter import filedialog
 import serial.tools.list_ports
 
 class ControlPair(tk.Frame):
@@ -240,6 +241,7 @@ class CLIFrame(tk.Frame):
         super().__init__(master)
         
         self.in_str = tk.StringVar()
+        self.in_str.set("[ENTER COMMAND HERE]")
         self.in_txt = tk.Entry(self, textvariable=self.in_str)
         self.in_txt.bind("<Return>", send_func)
         self.in_txt.place(relx=0, rely=0.8, relwidth=1, relheight=0.1)
@@ -337,3 +339,23 @@ class SerialSetup(tk.Frame):
     def refresh_ports(self):
         self.port_options = self.get_available_ports()
         self.port_dropdown['values'] = self.port_options
+
+class FileBrowser(tk.Frame):
+    def __init__(self, master):
+        super().__init__(master)
+        self.log_label = tk.Label(self, text="Log File:")
+        self.log_label.place(relx=0.2, rely=0, relwidth=0.1, relheight=1)
+        
+        self.browse_button = tk.Button(self, text="Select File", command=self.select_file)
+        self.browse_button.place(relx=0, rely=0, relwidth=0.2, relheight=1)
+        
+        self.label = tk.Label(self, borderwidth=2, relief="groove")
+        self.label.place(relx=0.3, rely=0, relwidth=0.7, relheight=1)
+        
+    def select_file(self):
+        path = filedialog.askopenfilename()
+        if path:
+            self.label.config(text=path)
+            
+    def get_path(self):
+        return self.label.cget("text")

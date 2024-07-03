@@ -139,13 +139,16 @@ class SerialApp(tk.Tk):
     def setup_gui(self):
         
         self.controls = tkp.ControlsFrame(self)
-        self.controls.place(relx=0, rely=0, relwidth=0.4, relheight=0.4)
+        self.controls.place(relx=0, rely=0, relwidth=0.4, relheight=0.3)
         
+        self.filebrowser = tkp.FileBrowser(self)
+        self.filebrowser.place(relx=0, rely=0.3, relwidth=0.4, relheight=0.05)
+                
         self.serial_setup = tkp.SerialSetup(self)
         self.serial_setup.place(relx=0, rely=0.9, relwidth=0.4, relheight=0.1)
 
         self.terminal = tkp.CLIFrame(self, self.send_entry)
-        self.terminal.place(relx=0, rely=0.4, relwidth=0.4, relheight=0.5)
+        self.terminal.place(relx=0, rely=0.35, relwidth=0.4, relheight=0.55)
         
         canvas = FigureCanvasTkAgg(f, self)
         canvas.draw()
