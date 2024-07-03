@@ -59,7 +59,8 @@ class CSVLogger:
             tstamp = str(datetime.datetime.now())
             writer.writerow([tstamp, 'RX' if is_rx else 'TX', message])
         else:
-            raise IOError("Log file not open")
+            self.open(self.generic_filename())  # Save to generic file
+            self.log_serial(message, is_rx)
 
 class SerialThread(threading.Thread):
     def __init__(self, serial, baud, data_queue):
@@ -88,7 +89,7 @@ class SerialThread(threading.Thread):
             try:
                 if self.ser.in_waiting:
                     data = self.ser.readline().decode('utf-8').strip()
-                    self.__log(data, is_rx=True)
+                    self.logger.log_serial(data, is_rx=True)
                     self.data_queue.put(data)
             except serial.SerialException as e:
                 print(f"Serial read error: {e}")
@@ -111,14 +112,8 @@ class SerialThread(threading.Thread):
     def write(self, data: str):
         data = data.strip() + '\n'
         ret = self.ser.write(data.encode('utf-8'))
-        self.__log(data.strip(), is_rx=False)
+        self.logger.log_serial(data.strip(), is_rx=False)
         return ret
-                
-    def __log(self, message, is_rx):
-        try:
-            self.logger.log_serial(message, is_rx)
-        except IOError as e:
-            print(e)
             
 class SerialApp(tk.Tk):
     def __init__(self, *args, **kwargs):
