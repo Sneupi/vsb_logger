@@ -64,9 +64,9 @@ class CSVLogger:
             self.log_serial(message, is_rx)
 
 class SerialThread(threading.Thread):
-    def __init__(self, data_queue):
+    def __init__(self):
         super().__init__()
-        self.data_queue = data_queue
+        self.txn_queue = queue.Queue()
         self.running = False
         self.logging = False
         self.ser = None
@@ -94,7 +94,7 @@ class SerialThread(threading.Thread):
                     data = self.ser.readline().decode('utf-8').strip()
                     if self.logging:
                         self.logger.log_serial(data, is_rx=True)
-                    self.data_queue.put(data)
+                    self.txn_queue.put(('RX', data))
                 else:
                     time.sleep(0.1)  # Prevent CPU hogging
             except serial.SerialException as e:
@@ -116,6 +116,7 @@ class SerialThread(threading.Thread):
         ret = self.ser.write(data.encode('utf-8'))
         if self.logging:
             self.logger.log_serial(data.strip(), is_rx=False)
+        self.txn_queue.put(('TX', data.strip()))
         return ret
             
 class SerialApp(tk.Tk):
@@ -126,9 +127,7 @@ class SerialApp(tk.Tk):
         self.geometry("1280x720")
         self.resizable(False, False)
         
-        self.data_queue = queue.Queue()
-        
-        self.serial_thread = SerialThread(self.data_queue)
+        self.serial_thread = SerialThread()
         self.serial_thread.daemon = True
         self.serial_thread.start()
 
@@ -300,17 +299,18 @@ class SerialApp(tk.Tk):
             self.controls.sys.set_led("connect", self.serial_thread.connected())
 
     def process_serial_data(self):
-        while not self.data_queue.empty():
-            data = self.data_queue.get()
-            self.update_controls(data)
-            self.append_cv_data(data)
+        q = self.serial_thread.txn_queue
+        while not q.empty():
+            direction, data = q.get()
+            if direction == 'RX':
+                self.update_controls(data)
+                self.append_cv_data(data)
             self.terminal.insert(data)
         self.after(100, self.process_serial_data)
 
     def send(self, data: str):
-        if self.serial_thread and self.serial_thread.connected():
-            if self.serial_thread.write(data):  # Success
-                self.terminal.insert(data)
+        if self.serial_thread.connected():
+            self.serial_thread.write(data)
     
     def send_entry(self, event=None):
         """Sending from terminal entry"""
@@ -318,7 +318,7 @@ class SerialApp(tk.Tk):
         self.send(data)
 
     def on_closing(self):
-        if self.serial_thread and self.serial_thread.running:
+        if self.serial_thread.running:
             self.serial_thread.stop()
         self.destroy()
 
