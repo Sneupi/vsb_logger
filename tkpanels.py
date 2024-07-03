@@ -205,25 +205,49 @@ class StateFrame(tk.Frame):
         self.num_errs = int(0)
         
         self.pvm = StatePair(self, label_text="PVM State")
-        self.pvm.place(relx=0, rely=0, relwidth=1, relheight=0.14)
+        self.pvm.place(relx=0, rely=0, relwidth=1, relheight=0.125)
 
         self.ctc = StatePair(self, label_text="CTC State")
-        self.ctc.place(relx=0, rely=0.14, relwidth=1, relheight=0.14)
+        self.ctc.place(relx=0, rely=0.125, relwidth=1, relheight=0.125)
 
         self.last_cv = StatePair(self, label_text="Last CV")
-        self.last_cv.place(relx=0, rely=0.28, relwidth=1, relheight=0.14)
+        self.last_cv.place(relx=0, rely=0.25, relwidth=1, relheight=0.125)
 
         self.last_cv_dn = StatePair(self, label_text="Last CV DN")
-        self.last_cv_dn.place(relx=0, rely=0.42, relwidth=1, relheight=0.14)
+        self.last_cv_dn.place(relx=0, rely=0.375, relwidth=1, relheight=0.125)
 
         self.errs = StatePair(self, label_text="Err Count")
-        self.errs.place(relx=0, rely=0.56, relwidth=1, relheight=0.14)
+        self.errs.place(relx=0, rely=0.75, relwidth=1, relheight=0.125)
 
         self.last_err = StatePair(self, label_text="Last Error")
-        self.last_err.place(relx=0, rely=0.70, relwidth=1, relheight=0.14)
+        self.last_err.place(relx=0, rely=0.625, relwidth=1, relheight=0.125)
+        
+        self.dn_delta = StatePair(self, label_text="DN Delta")
+        self.dn_delta.place(relx=0, rely=0.5, relwidth=1, relheight=0.125)
         
         self.clr_err_button = tk.Button(self, text="Clr Err Count", command=self._clear_errs)
-        self.clr_err_button.place(relx=0.5, rely=0.84, relwidth=0.5, relheight=0.14)
+        self.clr_err_button.place(relx=0.5, rely=0.875, relwidth=0.5, relheight=0.125)
+        
+    def set_state(self, state_name, new_text):
+        """Set the state of a specific readout
+        
+        Valid state names: pvm, ctc, last cv, 
+        last cv dn, errs, last err, dn delta"""
+        state_name = state_name.lower()
+        if state_name == "pvm":
+            self.pvm.update(new_text)
+        elif state_name == "ctc":
+            self.ctc.update(new_text)
+        elif state_name == "last cv":
+            self.last_cv.update(new_text)
+        elif state_name == "last cv dn":
+            self.last_cv_dn.update(new_text)
+        elif state_name == "errs":
+            self.errs.update(new_text)
+        elif state_name == "last err":
+            self.last_err.update(new_text)
+        elif state_name == "dn delta":
+            self.dn_delta.update(new_text)
         
     def _clear_errs(self):
         # FIXME not thread safe 

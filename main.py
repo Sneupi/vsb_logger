@@ -228,6 +228,13 @@ class SerialApp(tk.Tk):
     def append_cv_data(self, data: str):
         """If string is valid CV data, append to cv_data"""
         global cv_data
+        
+        # FIXME: This is a hack to prevent graph from squishing
+        MAX_POINTS = 80
+        for cell in cv_data:
+            while len(cell) >= MAX_POINTS:
+                cell.pop(0)
+                
         if "DBG CV" in data:
             tstamp, ch, val = [int(_) for _ in re.findall(r'\d+', data)[-3:]]
             tstamp = tstamp / 60000  # ms to minutes
