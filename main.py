@@ -35,28 +35,25 @@ def animate(i):
         a.plot(x, y, label=f"Ch{cell+1}")
     a.legend()
 
-class SerialLogger:
+class CSVLogger:
     def __init__(self):
         self.logfile = None
         
     def open(self, filename):
         self.close()  # If open, close
-        try:
-            self.logfile = open(filename, 'a', newline='')
-        except IOError as e:
-            self.logfile = None
-            raise e
-            
-    def generic_filename(self):
-        """Generic filename with current datetime"""
-        return f"serial_log_{datetime.datetime.now().strftime('%Y_%m_%d_%H%M%S')}.csv"
+        self.logfile = open(filename, 'a', newline='')
             
     def close(self):
         if self.logfile:
             self.logfile.close()
-            self.logfile = None
+        self.logfile = None
             
-    def log(self, message, is_rx):
+    def generic_filename(self):
+        """Generic filename with current datetime"""
+        return f"log_{datetime.datetime.now().strftime('%Y_%m_%d_%H%M%S')}.csv"
+            
+    def log_serial(self, message, is_rx):
+        """Log serial data to file in format: [timestamp, RX/TX, message]"""
         if self.logfile:
             writer = csv.writer(self.logfile)
             tstamp = str(datetime.datetime.now())
@@ -72,7 +69,7 @@ class SerialThread(threading.Thread):
         self.data_queue = data_queue
         self.running = False
         self.ser = None
-        self.logger = SerialLogger()
+        self.logger = CSVLogger()
         
     def run(self):
         try:
@@ -119,7 +116,7 @@ class SerialThread(threading.Thread):
                 
     def __log(self, message, is_rx):
         try:
-            self.logger.log(message, is_rx)
+            self.logger.log_serial(message, is_rx)
         except IOError as e:
             print(e)
             
