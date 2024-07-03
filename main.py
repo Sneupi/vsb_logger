@@ -97,7 +97,6 @@ class SerialThread(threading.Thread):
                     time.sleep(0.1)  # Prevent CPU hogging
             except serial.SerialException as e:
                 print(f"Serial read error: {e}")
-                self.running = False
             except UnicodeDecodeError as e:
                 print(f"Unicode error: {e}")
 
@@ -128,7 +127,10 @@ class SerialApp(tk.Tk):
         self.resizable(False, False)
         
         self.data_queue = queue.Queue()
-        self.serial_thread = None
+        
+        self.serial_thread = SerialThread(self.data_queue)
+        self.serial_thread.daemon = True
+        self.serial_thread.start()
 
         self.setup_gui()
         self.link_controls()
@@ -283,22 +285,14 @@ class SerialApp(tk.Tk):
         
     def connect_serial(self, event=None):
         port = self.serial_setup.get_port()
-        baud_rate = self.serial_setup.get_baud()
+        baud = self.serial_setup.get_baud()
         
-        if self.serial_thread and self.serial_thread.running:
-            self.serial_thread.stop()
-
-        if port and baud_rate:
-            self.serial_thread = SerialThread(self.data_queue)
-            self.serial_thread.daemon = True
+        if port and baud and self.serial_thread.running:
             try:
-                self.serial_thread.connect_serial(port, int(baud_rate))
+                self.serial_thread.connect_serial(port, int(baud))
             except serial.SerialException as e:
-                print(f"Serial error: {e}")
-            self.serial_thread.start()
-        
-        self.after(250, lambda: self.controls.sys
-                   .set_led("connect", self.serial_thread.connected()))
+                print(f"Serial connect error: {e}")
+            self.controls.sys.set_led("connect", self.serial_thread.connected())
 
     def process_serial_data(self):
         while not self.data_queue.empty():
