@@ -10,7 +10,7 @@ import time
 
 import matplotlib
 matplotlib.use("TkAgg")
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 import matplotlib.animation as animation
 from matplotlib import style
@@ -158,7 +158,19 @@ class SerialApp(tk.Tk):
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
         canvas._tkcanvas.place(relx=0.45, rely=0, relwidth=0.55, relheight=1)
+        
+        self.toolbar = NavigationToolbar2Tk(canvas, self)
+        self.toolbar.update()
+        self.toolbar.place(relx=0.55, rely=0.95, relwidth=0.45, relheight=0.05)
+        
+            
+        self.clear_graph = tk.Button(self, text="Clear Graph", command=self.clear_cv_data)
+        self.clear_graph.place(relx=0.45, rely=0.95, relwidth=0.1, relheight=0.05)
 
+    def clear_cv_data(self):
+        global cv_data
+        cv_data = [[] for _ in range(12)]
+        
     def update_controls(self, data: str):
         # FIXME: I can see this getting out 
         # of hand quickly with VSB firmware changes.
