@@ -454,6 +454,24 @@ class FileBrowser(tk.Frame):
     def get_path(self):
         return self.label.cget("text")
     
+class GraphFrame(tk.Frame):
+    """Live graph capable of scrolling, zooming, toggling 
+    auto-shift, manual and code-driven img snapshots."""  
+    def __init__(self, master):
+        super().__init__(master)
+        
+        self.lines = dict()  # Dict of lists of tuple (x,y)
+        
+        # TODO add widgets
+        
+    def add_data(self, data: tuple, line):
+        """Add new datapoint to graph.
+        Update and shifts graph if necessary."""
+        if line in self.lines:
+            self.lines[line].append(data)
+        else:
+            self.lines[line] = [data]
+
 class VSBGUI(tk.Tk):
     """GUI frontend for VSB logger & plotter"""
     
@@ -476,26 +494,32 @@ class VSBGUI(tk.Tk):
         self.terminal = CLIFrame(self)
         self.terminal.place(relx=0.01, rely=0.36, relwidth=0.43, relheight=0.58)
         
-        # TODO Graph
-        # TODO Graph scroll
-        # TODO Data clear
+        self.graph = GraphFrame(self)
+        # TODO place graph
+        
+        self.clear_data = tk.Button(self, text="Clear Data", command=lambda: print("Clear Data: Button function not bound"))
+        self.clear_data.place(relx=0.45, rely=0.95, relwidth=0.1, relheight=0.05)
     
-    def bind_control(self, widget_name, func):
-        """Bind function to a GUI control panel button."""
-        self.controls.bind_func(widget_name, func)
+    def bind_button(self, name, func):
+        """Bind function to a GUI control panel button.
+        
+        Valid Buttons: balance, connect, debug, debug2, 
+        error, extbus, info, log cpi, mq dump, run, 
+        show dn, stop, trace, trace2"""
+        self.controls.bind_func(name, func)
 
     def update_control(self, widget_name, data):
         """Update widget on control panel with new data."""
         self.controls.set_data(widget_name, data)
         
-    def terminal_insert(self, data):
+    def update_terminal(self, data):
         """Insert data into terminal."""
         self.terminal.insert(data)
         
-    def update_graph(self, datapoint: tuple):
+    def update_graph(self, datapoint: tuple, line: int):
         """Add new data (x, y) to graph.
         Plots and shifts graph if necessary."""
-        pass  # TODO
+        self.graph.add_data(datapoint, line)
 
 if __name__ == "__main__":
     # Example demo
