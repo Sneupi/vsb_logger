@@ -1,8 +1,8 @@
 """
 File: tkpanels.py
 Author: Gabe Venegas
-Purpose: Contains the classes for the GUI panels
-         to be used in the VSB GUI.
+Purpose: Contains tkinter panels to be used 
+         in a serial logging & plotter app.
 """
 
 import tkinter as tk
