@@ -1,3 +1,5 @@
+# FIXME: Very messy, slowly untangling as gui.py, myserial.py, etc...
+
 import tkinter as tk
 import threading
 import serial
