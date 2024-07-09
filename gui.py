@@ -33,26 +33,21 @@ class VSBGUI(tk.Tk):
         # TODO Graph scroll
         # TODO Data clear
     
-    def bind_control(self, name, func):
-        """Bind function to a GUI control (button, etc).
-        
-        Valid names:
-        - #TODO"""
-        pass  # TODO
+    def bind_control(self, widget_name, func):
+        """Bind function to a GUI control panel button."""
+        self.controls.bind_func(widget_name, func)
 
-    def update_widget(self, name, data):
-        """Update GUI widget with new data.
-        Must be valid datatype per widget, 
-        else TypeError.
+    def update_control(self, widget_name, data):
+        """Update widget on control panel with new data."""
+        self.controls.set_data(widget_name, data)
         
-        Datatypes:
-        - Status: str
-        - Button: bool
-        - Terminal: str
-        - Graph: list of tuples (x, y)
+    def terminal_insert(self, data):
+        """Insert data into terminal."""
+        self.terminal.insert(data)
         
-        Valid names:
-        - #TODO"""
+    def update_graph(self, tuple_list):
+        """Update graph with new data.
+        Accepts a list of tuples (x, y)."""
         pass  # TODO
 
 if __name__ == "__main__":
