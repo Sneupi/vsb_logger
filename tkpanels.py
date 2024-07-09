@@ -261,13 +261,13 @@ class StateFrame(tk.Frame):
 
 class CLIFrame(tk.Frame):
     """Command line interface"""
-    def __init__(self, master, send_func):
+    def __init__(self, master, send_func=None):
         super().__init__(master)
         
         self.in_str = tk.StringVar()
         self.in_txt = tk.Entry(self, textvariable=self.in_str)
         self.in_txt.config(border=5, relief="groove")
-        self.in_txt.bind("<Return>", send_func)
+        self.in_txt.bind("<Return>", send_func if send_func else lambda _: print("Terminal send function not bound"))
         self.in_txt.place(relx=0, rely=0.8, relwidth=1, relheight=0.15)
         
         self.out_txt = tk.Text(self, bg="black", fg="white")
@@ -280,7 +280,11 @@ class CLIFrame(tk.Frame):
         self.is_scroll = True
         self.scroll_button = tk.Button(self, text="Scroll OFF", command=self.pause_scroll)
         self.scroll_button.place(relx=0.33, rely=0.95, relwidth=0.33, relheight=0.05)
-        
+
+    def set_send_func(self, send_func):
+        """Set the function called on <Return>"""
+        self.in_txt.bind("<Return>", send_func)
+    
     def clear(self):
         """Clear the terminal"""
         self.out_txt.config(state=tk.NORMAL)
