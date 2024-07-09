@@ -38,31 +38,31 @@ class SystemFrame(tk.Frame):
         super().__init__(master)
         
         self.run = ControlPair(self, button_text="Run")
-        self.run.set_cmd(lambda: print("Run: Command not set"))
+        self.run.set_cmd(lambda: print("Run: Button function not bound"))
         self.run.place(relx=0, rely=0, relwidth=1, relheight=0.14)
 
         self.stop = ControlPair(self, button_text="Stop")
-        self.stop.set_cmd(lambda: print("Stop: Command not set"))
+        self.stop.set_cmd(lambda: print("Stop: Button function not bound"))
         self.stop.place(relx=0, rely=0.14, relwidth=1, relheight=0.14)
 
         self.balance = ControlPair(self, button_text="Balance")
-        self.balance.set_cmd(lambda: print("Balance: Command not set"))
+        self.balance.set_cmd(lambda: print("Balance: Button function not bound"))
         self.balance.place(relx=0, rely=0.28, relwidth=1, relheight=0.14)
 
         self.extbus = ControlPair(self, button_text="ExtBus")
-        self.extbus.set_cmd(lambda: print("ExtBus: Command not set"))
+        self.extbus.set_cmd(lambda: print("ExtBus: Button function not bound"))
         self.extbus.place(relx=0, rely=0.42, relwidth=1, relheight=0.14)
 
         self.mq_dump = ControlPair(self, button_text="MQ Dump")
-        self.mq_dump.set_cmd(lambda: print("MQ Dump: Command not set"))
+        self.mq_dump.set_cmd(lambda: print("MQ Dump: Button function not bound"))
         self.mq_dump.place(relx=0, rely=0.56, relwidth=1, relheight=0.14)
 
         self.show_dn = ControlPair(self, button_text="Show DN")
-        self.show_dn.set_cmd(lambda: print("Show DN: Command not set"))
+        self.show_dn.set_cmd(lambda: print("Show DN: Button function not bound"))
         self.show_dn.place(relx=0, rely=0.70, relwidth=1, relheight=0.14)
 
         self.connect = ControlPair(self, button_text="Connect")
-        self.connect.set_cmd(lambda: print("Connect: Command not set"))
+        self.connect.set_cmd(lambda: print("Connect: Button function not bound"))
         self.connect.place(relx=0, rely=0.84, relwidth=1, relheight=0.14)
 
     def set_button_command(self, button_name, command):
@@ -113,31 +113,31 @@ class DiagnosticFrame(tk.Frame):
         super().__init__(master)
         
         self.debug = ControlPair(self, button_text="Debug")
-        self.debug.set_cmd(lambda: print("Debug: Command not set"))
+        self.debug.set_cmd(lambda: print("Debug: Button function not bound"))
         self.debug.place(relx=0, rely=0, relwidth=1, relheight=0.14)
 
         self.debug2 = ControlPair(self, button_text="Debug2")
-        self.debug2.set_cmd(lambda: print("Debug2: Command not set"))
+        self.debug2.set_cmd(lambda: print("Debug2: Button function not bound"))
         self.debug2.place(relx=0, rely=0.14, relwidth=1, relheight=0.14)
 
         self.trace = ControlPair(self, button_text="Trace")
-        self.trace.set_cmd(lambda: print("Trace: Command not set"))
+        self.trace.set_cmd(lambda: print("Trace: Button function not bound"))
         self.trace.place(relx=0, rely=0.28, relwidth=1, relheight=0.14)
 
         self.trace2 = ControlPair(self, button_text="Trace2")
-        self.trace2.set_cmd(lambda: print("Trace2: Command not set"))
+        self.trace2.set_cmd(lambda: print("Trace2: Button function not bound"))
         self.trace2.place(relx=0, rely=0.42, relwidth=1, relheight=0.14)
 
         self.info = ControlPair(self, button_text="Info")
-        self.info.set_cmd(lambda: print("Info: Command not set"))
+        self.info.set_cmd(lambda: print("Info: Button function not bound"))
         self.info.place(relx=0, rely=0.56, relwidth=1, relheight=0.14)
 
         self.error = ControlPair(self, button_text="Error")
-        self.error.set_cmd(lambda: print("Error: Command not set"))
+        self.error.set_cmd(lambda: print("Error: Button function not bound"))
         self.error.place(relx=0, rely=0.70, relwidth=1, relheight=0.14)
 
         self.log_cpi = ControlPair(self, button_text="Log CPI")
-        self.log_cpi.set_cmd(lambda: print("Log CPI: Command not set"))
+        self.log_cpi.set_cmd(lambda: print("Log CPI: Button function not bound"))
         self.log_cpi.place(relx=0, rely=0.84, relwidth=1, relheight=0.14)
 
     def set_button_command(self, button_name, command):
