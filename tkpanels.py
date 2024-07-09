@@ -324,6 +324,73 @@ class ControlsFrame(tk.Frame):
         self.sys.place(relx=0, rely=0, relwidth=0.33, relheight=1)
         self.diag.place(relx=0.33, rely=0, relwidth=0.33, relheight=1)
         self.stat.place(relx=0.66, rely=0, relwidth=0.34, relheight=1)
+        
+    def set_data(self, widget_name, data):
+        """Update GUI widget with new data.
+        
+        Valid Datatype (per widget):
+        - State: str
+        - Button: bool
+        
+        Valid Buttons:
+        - balance
+        - connect
+        - debug
+        - debug2
+        - error
+        - extbus
+        - info
+        - log cpi
+        - mq dump
+        - run
+        - show dn
+        - stop
+        - trace
+        - trace2
+        
+        Valid States:
+        - ctc
+        - dn delta
+        - errs
+        - last cv
+        - last cv dn
+        - last err
+        - pvm"""
+        widget_name = widget_name.lower()
+        if widget_name in ["balance", "connect", "extbus", "mq dump", "run", "show dn", "stop"]:
+            if isinstance(data, bool):
+                self.sys.set_led(widget_name, data)
+            else:
+                raise TypeError("Invalid data type for button widget. Expected bool.")
+            
+        elif widget_name in ["debug", "debug2", "error", "info", "log cpi", "trace", "trace2"]:
+            if isinstance(data, bool):
+                self.diag.set_led(widget_name, data)
+            else:
+                raise TypeError("Invalid data type for button widget. Expected bool.")
+            
+        elif widget_name in ["ctc", "dn delta", "errs", "last cv", "last cv dn", "last err", "pvm"]:
+            if isinstance(data, str):
+                self.stat.set_state(widget_name, data)
+            else:
+                raise TypeError("Invalid data type for state widget. Expected str.")
+            
+        else:
+            raise ValueError("Invalid widget name.")
+    
+    def bind_func(self, widget_name, func):
+        """Bind function to GUI button
+        
+        Valid Buttons: 
+        balance, connect, debug, debug2, error, extbus, info, 
+        log cpi, mq dump, run, show dn, stop, trace, trace2"""
+        widget_name = widget_name.lower()
+        if widget_name in ["balance", "connect", "extbus", "mq dump", "run", "show dn", "stop"]:
+            self.sys.set_button_command(widget_name, func)
+        elif widget_name in ["debug", "debug2", "error", "info", "log cpi", "trace", "trace2"]:
+            self.diag.set_button_command(widget_name, func)
+        else:
+            raise ValueError("Invalid widget name.")
  
 class SerialSetup(tk.Frame):
     """User interface for setting up serial connection"""
