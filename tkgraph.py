@@ -20,6 +20,7 @@ class LiveGraphFrame(tk.Frame):
         self.fig, self.ax = plt.subplots()
         plt.subplots_adjust(bottom=0.25)
         self.line, = self.ax.plot([], [], lw=2)
+        self.lines = dict()
         self.ax.grid()
         self.xdata, self.ydata = [], []
         self.ani = animation.FuncAnimation(self.fig, self.run, blit=False, interval=self.REFRESH_MS,
@@ -36,6 +37,21 @@ class LiveGraphFrame(tk.Frame):
         self.auto_shift = True
         
         self.setup_widgets()
+
+    def add_datapoint(self, line_name, x: int, y: int):
+        """Internal function for updating the 
+        lines dict with a new data point."""
+        if line_name not in self.lines:
+            self.lines[line_name] = {
+                'line': self.ax.plot([], [], label=line_name)[0], 
+                'x': [], 
+                'y': []
+            }
+            
+        sub = self.lines[line_name]  # Sub-dictionary
+        sub['x'].append(x)
+        sub['y'].append(y)
+        sub['line'].set_data(sub['x'], sub['y'])
         
     def put_data(self, channel, time, value):
         """Standardized function to put data into queue."""
