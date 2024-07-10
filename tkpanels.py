@@ -550,12 +550,10 @@ class VSBGUI(tk.Tk):
         """Insert data into terminal."""
         self.terminal.insert(data)
         
-    def update_graph(self, datapoint: tuple, line: int):
+    def update_graph(self, channel: str, x: int, y: int):
         """Add new data (x, y) to graph.
         Plots and shifts graph if necessary."""
-        if len(datapoint) != 2:
-            raise ValueError("Expected tuple (x,y) of length 2.")
-        self.graph.add_datapoint(line, datapoint[0], datapoint[1])
+        self.graph.add_datapoint(channel, x, y)
 
 if __name__ == "__main__":
     # Example demo
