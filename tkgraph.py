@@ -42,8 +42,10 @@ spos = Slider(axpos, 'Pos', 0, 1)
 
 def update(val):
     if not auto_shift:
-        pos = spos.val * max(xdata)
-        ax.set_xlim(pos-X_WIDTH,pos)
+        mx = max(xdata)
+        mn = min(xdata)
+        pos = mn + (spos.val * (mx - mn))
+        ax.set_xlim(pos-X_WIDTH//2,pos+X_WIDTH//2)
         ax.figure.canvas.draw()
         # fig.canvas.draw_idle()
 
@@ -83,6 +85,12 @@ def toggle_auto_shift():
         
 auto_shift_button = tk.Button(root, text="Shift ON", command=toggle_auto_shift)
 auto_shift_button.pack()
+
+def clear_data():
+    del xdata[:]
+    del ydata[:]
+clear_data_button = tk.Button(root, text="Clear Data", command=clear_data)
+clear_data_button.pack()
 
 ani = animation.FuncAnimation(fig, run, data_gen, blit=False, interval=10,
                               repeat=False, init_func=init)
