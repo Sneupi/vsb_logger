@@ -61,9 +61,9 @@ class SystemFrame(tk.Frame):
         self.show_dn.set_cmd(lambda: print("Show DN: Button function not bound"))
         self.show_dn.place(relx=0, rely=0.70, relwidth=1, relheight=0.14)
 
-        self.connect = ControlPair(self, button_text="Connect")
-        self.connect.set_cmd(lambda: print("Connect: Button function not bound"))
-        self.connect.place(relx=0, rely=0.84, relwidth=1, relheight=0.14)
+        # self.connect = ControlPair(self, button_text="Connect")
+        # self.connect.set_cmd(lambda: print("Connect: Button function not bound"))
+        # self.connect.place(relx=0, rely=0.84, relwidth=1, relheight=0.14)
 
     def set_button_command(self, button_name, command):
         """Set the command for a specific button
@@ -136,9 +136,9 @@ class DiagnosticFrame(tk.Frame):
         self.error.set_cmd(lambda: print("Error: Button function not bound"))
         self.error.place(relx=0, rely=0.70, relwidth=1, relheight=0.14)
 
-        self.log_cpi = ControlPair(self, button_text="Log CPI")
-        self.log_cpi.set_cmd(lambda: print("Log CPI: Button function not bound"))
-        self.log_cpi.place(relx=0, rely=0.84, relwidth=1, relheight=0.14)
+        # self.log_cpi = ControlPair(self, button_text="Log CPI")
+        # self.log_cpi.set_cmd(lambda: print("Log CPI: Button function not bound"))
+        # self.log_cpi.place(relx=0, rely=0.84, relwidth=1, relheight=0.14)
 
     def set_button_command(self, button_name, command):
         """Set the command for a specific button
