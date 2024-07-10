@@ -436,21 +436,44 @@ class SerialSetup(tk.Frame):
         self.port_dropdown['values'] = self.port_options
 
 class FileBrowser(tk.Frame):
-    def __init__(self, master):
+    """Generic file browser Frame for selecting a 
+    file and performing a specific action on it.
+    
+    NOTE: User should declare a toggle 
+    function that returns a bool"""
+    def __init__(self, master, action_name="[Action]", toggle_func=None):
         super().__init__(master)
-        self.log_label = tk.Label(self, text="Log File:")
-        self.log_label.place(relx=0.2, rely=0, relwidth=0.1, relheight=1)
+        self.log_label = tk.Label(self, text="File:")
+        self.log_label.place(relx=0.3, rely=0, relwidth=0.1, relheight=1)
         
         self.browse_button = tk.Button(self, text="Select File", command=self.select_file)
-        self.browse_button.place(relx=0, rely=0, relwidth=0.2, relheight=1)
+        self.browse_button.place(relx=0, rely=0, relwidth=0.15, relheight=1)
+        
+        self.toggle_func = toggle_func
+        self.action_name = action_name
+        self.action_button = tk.Button(self, text=f"{action_name} OFF", bg="red", command=self.toggle_action)
+        self.action_button.place(relx=0.15, rely=0, relwidth=0.15, relheight=1)
         
         self.label = tk.Label(self, borderwidth=2, relief="groove")
-        self.label.place(relx=0.3, rely=0, relwidth=0.7, relheight=1)
+        self.label.place(relx=0.4, rely=0, relwidth=0.6, relheight=1)
         
     def select_file(self):
         path = filedialog.askopenfilename()
         if path:
             self.label.config(text=path)
+    
+    def toggle_action(self):
+        if not self.toggle_func:
+            print("Action function not bound.")
+            return
+        turn_on = self.toggle_func()
+        self.action_button.config(bg="light green" if turn_on else "red")
+        self.action_button.config(text="{} {}".format(self.action_name, "ON" if turn_on else "OFF"))
+        
+    def bind_action(self, action_name, bool_func):
+        self.action_name = action_name
+        self.toggle_func = bool_func
+        self.action_button.config(text=f"{action_name} OFF", bg="red")
             
     def get_path(self):
         return self.label.cget("text")
