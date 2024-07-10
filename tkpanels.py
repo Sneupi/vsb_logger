@@ -532,7 +532,18 @@ class VSBGUI(tk.Tk):
         self.terminal.place(relx=0.01, rely=0.36, relwidth=0.43, relheight=0.58)
         
         self.graph = LiveGraphFrame(self)
-        self.graph.place(relx=0.45, rely=0, relwidth=0.55, relheight=1)
+        self.graph.place(relx=0.45, rely=0.05, relwidth=0.55, relheight=1)
+        
+        self.help_button = tk.Button(self, text="HELP", command=lambda: print("Help not implemented yet"))  # TODO implement help
+        self.help_button.place(relx=0.8, rely=0, relwidth=0.1, relheight=0.05)
+        
+        self.exit_button = tk.Button(self, text="EXIT", command=lambda: self.quit() or self.destroy())
+        self.exit_button.place(relx=0.9, rely=0, relwidth=0.1, relheight=0.05)
+    
+    def bind_exit(self, func):
+        """Bind custom function on exit"""
+        self.exit_button.config(command=func)
+        self.protocol("WM_DELETE_WINDOW", func)
     
     def bind_button(self, name, func):
         """Bind function to a GUI control panel button.
