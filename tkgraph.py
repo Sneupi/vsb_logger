@@ -78,7 +78,10 @@ def toggle_auto_shift():
     global auto_shift
     auto_shift = not auto_shift
     auto_shift_button.config(text="Shift ON" if auto_shift else "Shift OFF")
-auto_shift_button = tk.Button(root, text="Auto Shift", command=toggle_auto_shift)
+    if not auto_shift:
+        update(0)  # Update with current slider value
+        
+auto_shift_button = tk.Button(root, text="Shift ON", command=toggle_auto_shift)
 auto_shift_button.pack()
 
 ani = animation.FuncAnimation(fig, run, data_gen, blit=False, interval=10,
