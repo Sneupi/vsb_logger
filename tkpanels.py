@@ -534,12 +534,16 @@ class VSBGUI(tk.Tk):
         self.graph = LiveGraphFrame(self)
         self.graph.place(relx=0.45, rely=0.05, relwidth=0.55, relheight=1)
         
-        self.help_button = tk.Button(self, text="HELP", command=lambda: print("Help not implemented yet"))  # TODO implement help
+        self.help_button = tk.Button(self, text="HELP", command=self.spawn_help)
         self.help_button.place(relx=0.8, rely=0, relwidth=0.1, relheight=0.05)
         
         self.exit_button = tk.Button(self, text="EXIT", command=lambda: self.quit() or self.destroy())
         self.exit_button.place(relx=0.9, rely=0, relwidth=0.1, relheight=0.05)
     
+    def spawn_help(self):
+        """Spawn a help window"""
+        help_window = VSBHelpTopLevel(self)
+
     def bind_exit(self, func):
         """Bind custom function on exit"""
         self.exit_button.config(command=func)
@@ -566,6 +570,31 @@ class VSBGUI(tk.Tk):
         Plots and shifts graph if necessary."""
         self.graph.add_datapoint(channel, x, y)
 
+class VSBHelpTopLevel(tk.Toplevel):
+    def __init__(self, master):
+        super().__init__(master)
+        
+        self.title("Help")
+        self.geometry("400x300")
+
+        self.text = tk.Text(self, wrap="word", state="disabled")
+        self.text.pack(fill="both", expand=True)
+
+        self.populate_help_content()
+
+    def populate_help_content(self):
+        help_content = """
+        Welcome to the VSB Logger Help!
+
+        (I still need to write this part...)
+
+        Thank you for using VSB Logger!
+        """
+
+        self.text.configure(state="normal")
+        self.text.insert("1.0", help_content)
+        self.text.configure(state="disabled")
+        
 if __name__ == "__main__":
     # Example demo
     app = VSBGUI()
