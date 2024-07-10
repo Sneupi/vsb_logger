@@ -7,16 +7,47 @@ import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
+import queue
+
+data_queue = queue.Queue()
 auto_shift = True
 X_WIDTH = 10
 Y_HEIGHT = 4095
 
+def put_data(channel, time, value):
+    """Standardized function to put data into queue."""
+    data_queue.put((channel, time, value))
+
+def get_data():
+    """Standardized function to get data from queue."""
+    channel, time, value = data_queue.get()
+    return channel, time, value
+
 def data_gen(t=0):
+    """Yields data by intaking from queue object"""
     cnt = 0
-    while cnt < 2000:
-        cnt += 1
-        t += 0.1
-        yield t, t*10  # np.sin(2*np.pi*t) * np.exp(-t/10.)
+    while True:  # FIXME error upon exit
+        if not data_queue.empty():
+            channel, t, value = get_data()
+            yield t, value
+
+
+# ==============================================================================
+# Dummy data thread
+import threading
+import time
+import random
+def dummy_data_thread():
+    """Simulate graphing data coming in from a queue."""
+    while True:
+        for i in range(12):
+            # format: (channel, time, value)
+            put_data(i, time.time_ns()/1e9, random.randint(0, 4095))
+            time.sleep(0.07)
+thread = threading.Thread(target=dummy_data_thread)
+thread.daemon = True
+thread.start()
+# ==============================================================================
 
 
 def init():
@@ -89,8 +120,8 @@ auto_shift_button.pack()
 def clear_data():
     del xdata[:]
     del ydata[:]
-clear_data_button = tk.Button(root, text="Clear Data", command=clear_data)
-clear_data_button.pack()
+clear_graph_button = tk.Button(root, text="Clear Graph", command=clear_data)
+clear_graph_button.pack()
 
 ani = animation.FuncAnimation(fig, run, data_gen, blit=False, interval=10,
                               repeat=False, init_func=init)
