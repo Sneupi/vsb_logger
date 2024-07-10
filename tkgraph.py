@@ -13,6 +13,7 @@ data_queue = queue.Queue()
 auto_shift = True
 X_WIDTH = 10
 Y_HEIGHT = 4095
+REFRESH_MS = 500
 
 def put_data(channel, time, value):
     """Standardized function to put data into queue."""
@@ -22,15 +23,6 @@ def get_data():
     """Standardized function to get data from queue."""
     channel, time, value = data_queue.get()
     return channel, time, value
-
-def data_gen(t=0):
-    """Yields data by intaking from queue object"""
-    cnt = 0
-    while True:  # FIXME error upon exit
-        if not data_queue.empty():
-            channel, t, value = get_data()
-            yield t, value
-
 
 # ==============================================================================
 # Dummy data thread
@@ -85,11 +77,14 @@ spos.on_changed(update)
 
 # Animation code
 def run(data):
-    t, y = data
-    xdata.append(t)
-    ydata.append(y)
-    xmin, xmax = ax.get_xlim()
-    
+    """Intake data from queue to update graph."""
+    while not data_queue.empty():
+        channel, time, value = get_data()
+        
+        xdata.append(time)
+        ydata.append(value)
+        xmin, xmax = ax.get_xlim()
+        
     mx = max(xdata)
     if auto_shift and mx >= xmax:
         ax.set_xlim(mx-X_WIDTH, mx)
@@ -127,7 +122,7 @@ toolbar = NavigationToolbar2Tk(canvas, root)
 toolbar.update()
 toolbar.place(relx=0.4, rely=0.95, relwidth=0.6, relheight=0.05)
 
-ani = animation.FuncAnimation(fig, run, data_gen, blit=False, interval=10,
+ani = animation.FuncAnimation(fig, run, blit=False, interval=REFRESH_MS,
                               repeat=False, init_func=init)
 root.geometry("800x600")
 root.protocol("WM_DELETE_WINDOW", lambda: root.quit() or root.destroy())
