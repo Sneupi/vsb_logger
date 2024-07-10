@@ -8,6 +8,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 import serial.tools.list_ports
+from tkgraph import LiveGraphFrame
 
 class ControlPair(tk.Frame):
     """Frame with a button and an indicator"""
@@ -453,24 +454,6 @@ class FileBrowser(tk.Frame):
             
     def get_path(self):
         return self.label.cget("text")
-    
-class GraphFrame(tk.Frame):
-    """Live graph capable of scrolling, zooming, toggling 
-    auto-shift, manual and code-driven img snapshots."""  
-    def __init__(self, master):
-        super().__init__(master)
-        
-        self.lines = dict()  # Dict of lists of tuple (x,y)
-        
-        # TODO add widgets
-        
-    def add_data(self, data: tuple, line):
-        """Add new datapoint to graph.
-        Update and shifts graph if necessary."""
-        if line in self.lines:
-            self.lines[line].append(data)
-        else:
-            self.lines[line] = [data]
 
 class VSBGUI(tk.Tk):
     """GUI frontend for VSB logger & plotter"""
@@ -481,6 +464,7 @@ class VSBGUI(tk.Tk):
         self.title("VSB Logger")
         self.geometry("1400x700")
         self.resizable(False, False)
+        self.protocol("WM_DELETE_WINDOW", lambda: self.quit() or self.destroy())
 
         self.controls = ControlsFrame(self)
         self.controls.place(relx=0, rely=0, relwidth=0.45, relheight=0.3)
@@ -494,11 +478,8 @@ class VSBGUI(tk.Tk):
         self.terminal = CLIFrame(self)
         self.terminal.place(relx=0.01, rely=0.36, relwidth=0.43, relheight=0.58)
         
-        self.graph = GraphFrame(self)
-        # TODO place graph
-        
-        self.clear_data = tk.Button(self, text="Clear Data", command=lambda: print("Clear Data: Button function not bound"))
-        self.clear_data.place(relx=0.45, rely=0.95, relwidth=0.1, relheight=0.05)
+        self.graph = LiveGraphFrame(self)
+        self.graph.place(relx=0.45, rely=0, relwidth=0.55, relheight=1)
     
     def bind_button(self, name, func):
         """Bind function to a GUI control panel button.
@@ -519,7 +500,9 @@ class VSBGUI(tk.Tk):
     def update_graph(self, datapoint: tuple, line: int):
         """Add new data (x, y) to graph.
         Plots and shifts graph if necessary."""
-        self.graph.add_data(datapoint, line)
+        if len(datapoint) != 2:
+            raise ValueError("Expected tuple (x,y) of length 2.")
+        self.graph.add_datapoint(line, datapoint[0], datapoint[1])
 
 if __name__ == "__main__":
     # Example demo
