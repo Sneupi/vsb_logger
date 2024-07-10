@@ -14,6 +14,7 @@ class ControlPair(tk.Frame):
     """Frame with a button and an indicator"""
     def __init__(self, master, button_text="N/A"):
         super().__init__(master)
+        self.config(width=200, height=50)
         self.is_on = False
         self.led = tk.Label(self, width=2, relief="solid", borderwidth=1)
         self.set_led(False)
@@ -393,8 +394,12 @@ class ControlsFrame(tk.Frame):
             raise ValueError("Invalid widget name.")
  
 class SerialSetup(tk.Frame):
-    """User interface for setting up serial connection"""
-    def __init__(self, parent):
+    """User interface for setting up serial connection
+    
+    NOTE: User should bind a connect function 
+    to the connect button that has the signature:
+    func(port: str, baud: int) -> bool"""
+    def __init__(self, parent, connect_func=None):
         super().__init__(parent)
         
         self.port_label = tk.Label(self, text="Port:")
@@ -418,6 +423,31 @@ class SerialSetup(tk.Frame):
         
         self.refresh_button = tk.Button(self, text="Refresh Ports", command=self.refresh_ports)
         self.refresh_button.pack(side='right', padx=5, pady=5)
+        
+        self.connect_func = connect_func
+        self.connect_button = ControlPair(self, button_text="Connect")
+        self.connect_button.set_cmd(self.connect)
+        self.connect_button.pack(side='right', padx=5, pady=5)
+        
+    def bind_connect(self, func):
+        self.connect_func = func
+        
+    def connect(self):
+        """Internal function to connect to serial port,
+        allowing button state to be updated."""
+        if not self.connect_func:
+            print("Connect function not bound.")
+            return
+        
+        port = self.get_port()
+        baud = self.get_baud()
+        
+        if port and baud:
+            try:
+                ok = self.connect_func(port, baud)
+                self.connect_button.set_led(ok)
+            except Exception as e:
+                print(f"SerialSetup Error: {e}")
     
     def get_available_ports(self):
         ports = []
