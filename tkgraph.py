@@ -4,7 +4,7 @@ import matplotlib.animation as animation
 from matplotlib.widgets import Slider
 
 import tkinter as tk
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 
 import queue
@@ -105,7 +105,7 @@ root = tk.Tk()
 
 canvas = FigureCanvasTkAgg(fig, master=root)
 canvas.draw()
-canvas.get_tk_widget().pack()
+canvas.get_tk_widget().place(relx=0, rely=0, relwidth=1, relheight=0.95)
 
 def toggle_auto_shift():
     global auto_shift
@@ -115,16 +115,21 @@ def toggle_auto_shift():
         update(0)  # Update with current slider value
         
 auto_shift_button = tk.Button(root, text="Shift ON", command=toggle_auto_shift)
-auto_shift_button.pack()
+auto_shift_button.place(relx=0, rely=0.95, relwidth=0.2, relheight=0.05)
 
 def clear_data():
     del xdata[:]
     del ydata[:]
 clear_graph_button = tk.Button(root, text="Clear Graph", command=clear_data)
-clear_graph_button.pack()
+clear_graph_button.place(relx=0.2, rely=0.95, relwidth=0.2, relheight=0.05)
+
+toolbar = NavigationToolbar2Tk(canvas, root)
+toolbar.update()
+toolbar.place(relx=0.4, rely=0.95, relwidth=0.6, relheight=0.05)
 
 ani = animation.FuncAnimation(fig, run, data_gen, blit=False, interval=10,
                               repeat=False, init_func=init)
+root.geometry("800x600")
 root.protocol("WM_DELETE_WINDOW", lambda: root.quit() or root.destroy())
 root.mainloop()
 
