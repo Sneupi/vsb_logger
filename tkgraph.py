@@ -112,6 +112,7 @@ class LiveGraphFrame(tk.Frame):
             mx = max(all_x)
             if self.auto_shift and mx >= xmax:
                 self.ax.set_xlim(mx-self.X_WIDTH, mx)
+                self.ax.legend()
                 self.ax.figure.canvas.draw()
 
         return self.get_all_lines()
@@ -156,7 +157,7 @@ if __name__ == "__main__":
             for i in range(12):
                 t = time.time_ns()/1e9
                 v = (np.sin(t) + i) * 4095/12
-                graph.put_data(i, t, v)
+                graph.put_data(f"CH{i+1}", t, v)
                 time.sleep(0.07)
     
     root = tk.Tk()
