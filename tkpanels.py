@@ -14,7 +14,7 @@ class ControlPair(tk.Frame):
     """Frame with a button and an indicator"""
     def __init__(self, master, button_text="N/A"):
         super().__init__(master)
-        self.config(width=200, height=50)
+        self.config(width=60, height=20)
         self.is_on = False
         self.led = tk.Label(self, width=2, relief="solid", borderwidth=1)
         self.set_led(False)
@@ -40,31 +40,31 @@ class SystemFrame(tk.Frame):
         
         self.run = ControlPair(self, button_text="Run")
         self.run.set_cmd(lambda: print("Run: Button function not bound"))
-        self.run.place(relx=0, rely=0, relwidth=1, relheight=0.14)
+        self.run.pack(fill="both", expand=True)
 
         self.stop = ControlPair(self, button_text="Stop")
         self.stop.set_cmd(lambda: print("Stop: Button function not bound"))
-        self.stop.place(relx=0, rely=0.14, relwidth=1, relheight=0.14)
+        self.stop.pack(fill="both", expand=True)
 
         self.balance = ControlPair(self, button_text="Balance")
         self.balance.set_cmd(lambda: print("Balance: Button function not bound"))
-        self.balance.place(relx=0, rely=0.28, relwidth=1, relheight=0.14)
+        self.balance.pack(fill="both", expand=True)
 
         self.extbus = ControlPair(self, button_text="ExtBus")
         self.extbus.set_cmd(lambda: print("ExtBus: Button function not bound"))
-        self.extbus.place(relx=0, rely=0.42, relwidth=1, relheight=0.14)
+        self.extbus.pack(fill="both", expand=True)
 
         self.mq_dump = ControlPair(self, button_text="MQ Dump")
         self.mq_dump.set_cmd(lambda: print("MQ Dump: Button function not bound"))
-        self.mq_dump.place(relx=0, rely=0.56, relwidth=1, relheight=0.14)
+        self.mq_dump.pack(fill="both", expand=True)
 
         self.show_dn = ControlPair(self, button_text="Show DN")
         self.show_dn.set_cmd(lambda: print("Show DN: Button function not bound"))
-        self.show_dn.place(relx=0, rely=0.70, relwidth=1, relheight=0.14)
+        self.show_dn.pack(fill="both", expand=True)
 
-        # self.connect = ControlPair(self, button_text="Connect")
-        # self.connect.set_cmd(lambda: print("Connect: Button function not bound"))
-        # self.connect.place(relx=0, rely=0.84, relwidth=1, relheight=0.14)
+        self.connect = ControlPair(self, button_text="Connect")
+        self.connect.set_cmd(lambda: print("Connect: Button function not bound"))
+        self.connect.pack(fill="both", expand=True)
 
     def set_button_command(self, button_name, command):
         """Set the command for a specific button
@@ -84,8 +84,8 @@ class SystemFrame(tk.Frame):
             self.mq_dump.set_cmd(command)
         elif button_name == "show dn":
             self.show_dn.set_cmd(command)
-        # elif button_name == "connect":
-        #     self.connect.set_cmd(command)
+        elif button_name == "connect":
+            self.connect.set_cmd(command)
             
     def set_led(self, led_name, is_on: bool):
         """Set the state of a specific LED
@@ -105,8 +105,8 @@ class SystemFrame(tk.Frame):
             self.mq_dump.set_led(is_on)
         elif led_name == "show dn":
             self.show_dn.set_led(is_on)
-        # elif led_name == "connect":
-        #     self.connect.set_led(is_on)
+        elif led_name == "connect":
+            self.connect.set_led(is_on)
             
     def get_led(self, led_name):
         """Get the state of a specific LED
@@ -126,8 +126,8 @@ class SystemFrame(tk.Frame):
             return self.mq_dump.is_on
         elif led_name == "show dn":
             return self.show_dn.is_on
-        # elif led_name == "connect":
-        #     return self.connect.is_on
+        elif led_name == "connect":
+            return self.connect.is_on
             
 class DiagnosticFrame(tk.Frame):
     """Column of diagnostic controls"""
@@ -136,31 +136,31 @@ class DiagnosticFrame(tk.Frame):
         
         self.debug = ControlPair(self, button_text="Debug")
         self.debug.set_cmd(lambda: print("Debug: Button function not bound"))
-        self.debug.place(relx=0, rely=0, relwidth=1, relheight=0.14)
+        self.debug.pack(fill="both", expand=True)
 
         self.debug2 = ControlPair(self, button_text="Debug2")
         self.debug2.set_cmd(lambda: print("Debug2: Button function not bound"))
-        self.debug2.place(relx=0, rely=0.14, relwidth=1, relheight=0.14)
+        self.debug2.pack(fill="both", expand=True)
 
         self.trace = ControlPair(self, button_text="Trace")
         self.trace.set_cmd(lambda: print("Trace: Button function not bound"))
-        self.trace.place(relx=0, rely=0.28, relwidth=1, relheight=0.14)
+        self.trace.pack(fill="both", expand=True)
 
         self.trace2 = ControlPair(self, button_text="Trace2")
         self.trace2.set_cmd(lambda: print("Trace2: Button function not bound"))
-        self.trace2.place(relx=0, rely=0.42, relwidth=1, relheight=0.14)
+        self.trace2.pack(fill="both", expand=True)
 
         self.info = ControlPair(self, button_text="Info")
         self.info.set_cmd(lambda: print("Info: Button function not bound"))
-        self.info.place(relx=0, rely=0.56, relwidth=1, relheight=0.14)
+        self.info.pack(fill="both", expand=True)
 
         self.error = ControlPair(self, button_text="Error")
         self.error.set_cmd(lambda: print("Error: Button function not bound"))
-        self.error.place(relx=0, rely=0.70, relwidth=1, relheight=0.14)
+        self.error.pack(fill="both", expand=True)
 
         # self.log_cpi = ControlPair(self, button_text="Log CPI")
         # self.log_cpi.set_cmd(lambda: print("Log CPI: Button function not bound"))
-        # self.log_cpi.place(relx=0, rely=0.84, relwidth=1, relheight=0.14)
+        # self.log_cpi.pack(fill="both", expand=True)
 
     def set_button_command(self, button_name, command):
         """Set the command for a specific button
@@ -477,7 +477,7 @@ class SerialSetup(tk.Frame):
         self.connect_func = connect_func
         self.connect_button = ControlPair(self, button_text="Connect")
         self.connect_button.set_cmd(self.connect)
-        self.connect_button.pack(side='right', padx=5, pady=5)
+        self.connect_button.pack(side='right', padx=5, pady=5, fill='both', expand=True)
         
     def bind_connect(self, func):
         self.connect_func = func
