@@ -664,7 +664,8 @@ class VSBGUI(tk.Tk):
             self.filebrowser.set_button_state(state)
         elif widget_name == "connect":
             self.serial_setup.connect_button.set_led(state)
-        elif widget_name in ["balance", "extbus", "mq dump", "run", "show dn", "stop"]:
+        elif widget_name in ["balance", "extbus", "mq dump", "run", "show dn", "stop", 
+                             "debug", "debug2", "error", "info", "trace", "trace2"]:
             self.controls.set_data(widget_name, state)
     
     def update_statistic(self, widget_name, data: str):
