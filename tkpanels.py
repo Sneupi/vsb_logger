@@ -245,8 +245,6 @@ class StateFrame(tk.Frame):
     def __init__(self, master):
         super().__init__(master)
         
-        self.num_errs = int(0)
-        
         self.pvm = StatePair(self, label_text="PVM State")
         self.pvm.place(relx=0, rely=0, relwidth=1, relheight=0.125)
 
@@ -268,7 +266,7 @@ class StateFrame(tk.Frame):
         self.dn_delta = StatePair(self, label_text="DN Delta")
         self.dn_delta.place(relx=0, rely=0.5, relwidth=1, relheight=0.125)
         
-        self.clr_err_button = tk.Button(self, text="Clr Err Count", command=self._clear_errs)
+        self.clr_err_button = tk.Button(self, text="Clr Err Count", command=lambda: print("Clear Errs: Button function not bound"))
         self.clr_err_button.place(relx=0.5, rely=0.875, relwidth=0.5, relheight=0.125)
         
     def set_state(self, state_name, new_text):
@@ -291,17 +289,12 @@ class StateFrame(tk.Frame):
             self.last_err.update(new_text)
         elif state_name == "dn delta":
             self.dn_delta.update(new_text)
-        
-    def _clear_errs(self):
-        # FIXME not thread safe 
-        self.num_errs = 0
-        self.errs.update(self.num_errs)
-        
-    def _incr_errs(self):
-        # FIXME not thread safe
-        self.num_errs += 1
-        self.errs.update(self.num_errs)        
 
+    def set_clear_func(self, func):
+        """Set function called on clear error button"""
+
+        self.clr_err_button.config(command=func)
+            
 class CLIFrame(tk.Frame):
     """Command line interface"""
     def __init__(self, master, send_func=None):
@@ -632,9 +625,11 @@ class VSBGUI(tk.Tk):
         
         Valid Buttons: balance, connect, debug, debug2, 
         error, extbus, info, log cpi, mq dump, run, 
-        show dn, stop, trace, trace2"""
+        show dn, stop, trace, trace2, clear err"""
         name = name.lower()
-        if name == "connect":
+        if name == "clear err":
+            self.controls.stat.set_clear_func(func)
+        elif name == "connect":
             self.serial_setup.bind_connect(func)
         elif name == "log cpi":
             self.filebrowser.bind_action("Log CPI", func)
