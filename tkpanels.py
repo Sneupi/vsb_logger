@@ -595,7 +595,7 @@ class VSBGUI(tk.Tk):
         self.terminal.place(relx=0.01, rely=0.36, relwidth=0.43, relheight=0.58)
         
         self.graph = LiveGraphFrame(self)
-        self.graph.place(relx=0.45, rely=0.05, relwidth=0.55, relheight=1)
+        self.graph.place(relx=0.45, rely=0.05, relwidth=0.55, relheight=0.95)
         
         self.help_button = tk.Button(self, text="HELP", command=self.spawn_help)
         self.help_button.place(relx=0.8, rely=0, relwidth=0.1, relheight=0.05)
