@@ -52,10 +52,15 @@ class SerialThread(threading.Thread):
          
 
 class SerialLogger:
-    """Class for logging serial RX/TX data to CSV"""
+    """Class for logging serial RX/TX data to file"""
     def __init__(self, filepath, mode='a'):
-        self.file = open(filepath, mode)
-    
+        if not filepath or filepath == '':
+            raise OSError("SerialLogger null path: {}".format(filepath))
+        elif not filepath.endswith(('.csv', '.txt')):
+            raise OSError("SerialLogger invalid file extension: {}".format(filepath))
+        else:
+            self.file = open(filepath, mode)
+        
     def __format_entry(self, data, direction):
         return f'{datetime.datetime.now()},{direction},{data}\n'
     
