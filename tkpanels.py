@@ -641,9 +641,45 @@ class VSBGUI(tk.Tk):
         else:
             self.controls.bind_func(name, func)
 
-    def update_control(self, widget_name, data):
-        """Update widget on control panel with new data."""
-        self.controls.set_data(widget_name, data)
+    def update_button(self, widget_name, state: bool):
+        """Update button on GUI with new state.
+        
+        Valid Names:
+        - balance
+        - connect
+        - debug
+        - debug2
+        - error
+        - extbus
+        - info
+        - log cpi
+        - mq dump
+        - run
+        - show dn
+        - stop
+        - trace
+        - trace2"""
+        
+        if widget_name == "log cpi":
+            self.filebrowser.set_button_state(state)
+        elif widget_name == "connect":
+            self.serial_setup.connect_button.set_led(state)
+        elif widget_name in ["balance", "extbus", "mq dump", "run", "show dn", "stop"]:
+            self.controls.set_data(widget_name, state)
+    
+    def update_statistic(self, widget_name, data: str):
+        """Update statistic on GUI with new string.
+        
+        Valid Names:
+        - ctc
+        - dn delta
+        - errs
+        - last cv
+        - last cv dn
+        - last err
+        - pvm"""
+        if widget_name in ["ctc", "dn delta", "errs", "last cv", "last cv dn", "last err", "pvm"]:
+            self.controls.set_data(widget_name, data)
         
     def update_terminal(self, data):
         """Insert data into terminal."""
