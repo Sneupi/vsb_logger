@@ -45,7 +45,7 @@ class VSBApp(threading.Thread):
         self.gui.bind_button("balance", lambda: send("EB", "DB", "balance"))
         self.gui.bind_button("extbus", lambda: send("XE", "XD", "extbus"))
         self.gui.bind_button("mq dump", lambda: send("EQ", "DQ", "mq dump"))
-        self.gui.bind_button("show dn", lambda: send("SN", "", "show dn"))
+        self.gui.bind_button("show dn", lambda: self.write("SN"))
         
         self.gui.bind_button("debug", lambda: send("ED", "DD", "debug"))
         self.gui.bind_button("debug2", lambda: send("E2", "D2", "debug2"))
@@ -53,6 +53,69 @@ class VSBApp(threading.Thread):
         self.gui.bind_button("trace2", lambda: print("Trace2 not implemented yet"))  # TODO trace2 button
         self.gui.bind_button("info", lambda: send("SH", "", "info"))  # FIXME info button vague; SH for now 
         self.gui.bind_button("error", lambda: send("EE", "DE", "error"))
+        
+    def gui_update_buttons(self, data: str):
+        """Update GUI buttons based on incoming data strings"""
+        # FIXME hardcoded based on current firmware print statements
+        
+        # run/stop
+        if "RN:" in data:
+            self.gui.update_button("run", True)
+            self.gui.update_button("stop", False)
+            
+        elif "ST:" in data:
+            self.gui.update_button("run", False)
+            self.gui.update_button("stop", True)
+        # balance
+        elif "EB:" in data and "enabled" in data:
+            self.gui.update_button("balance", True)
+            
+        elif "DB:" in data and "disabled" in data:
+            self.gui.update_button("balance", False)
+        # extbus
+        elif "XE:" in data and "on" in data:
+            self.gui.update_button("extbus", True)
+            
+        elif "XD:" in data and "off" in data:
+            self.gui.update_button("extbus", False)
+        # mq dump
+        elif "EQ:" in data and "enabled" in data:
+            self.gui.update_button("mq dump", True)
+            
+        elif "DQ:" in data and "disabled" in data:
+            self.gui.update_button("mq dump", False)
+        # show dn
+        elif "SN:" in data and "-> ON" in data:
+            self.gui.update_button("show dn", True)
+        elif "SN:" in data and "-> OFF" in data:
+            self.gui.update_button("show dn", False)
+        # debug
+        elif "ED:" in data and "enabled" in data:
+            self.gui.update_button("debug", True)
+        
+        elif "DD:" in data and "disabled" in data:
+            self.gui.update_button("debug", False)
+        # debug2
+        elif "E2:" in data and "enabled" in data:
+            self.gui.update_button("debug2", True)
+        
+        elif "D2:" in data and "disabled" in data:
+            self.gui.update_button("debug2", False)
+        # trace
+        elif "TA:" in data and "active" in data:
+            self.gui.update_button("trace", True)
+        
+        elif "DT:" in data and "disabled" in data:
+            self.gui.update_button("trace", False)
+        # trace2  # TODO trace2
+        # info  # TODO info
+        # error
+        elif "EE:" in data and "enabled" in data:
+            self.gui.update_button("error", True)
+        
+        elif "DE:" in data and "disabled" in data:
+            self.gui.update_button("error", False)
+        # log cpi  # TODO log cpi
         
         
     def run(self):
@@ -63,7 +126,7 @@ class VSBApp(threading.Thread):
                 while self.ser and self.ser.is_open and self.ser.in_waiting:
                     data = self.ser.readline().decode('utf-8').strip()
                     self.gui.update_terminal(data)
-                    # TODO (if ctrl_status) update buttons
+                    self.gui_update_buttons(data)
                     # TODO (if stats) update stats
                     # TODO (if cv_data) update graph
                     if self.gui.filebrowser.enabled:
