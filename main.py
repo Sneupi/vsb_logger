@@ -48,6 +48,7 @@ class VSBApp(threading.Thread):
         self.ser = None
         self.logger = None
         self.probe_thread = None
+        self.last_cv12 = 0
         
         self.daemon = True  # threading.Thread
         self.bind_functions()
@@ -166,6 +167,10 @@ class VSBApp(threading.Thread):
             self.gui.update_statistic("errs", status)
         elif "Last Error:" in data:
             self.gui.update_statistic("last err", status)
+        elif "DBG CV" in data and "12:" in data:
+            t = int(data.split(" ")[0])
+            self.gui.update_statistic("dn delta", f"{t - self.last_cv12} ms")
+            self.last_cv12 = t
             
     def gui_update_graph(self, data: str):
         """Update GUI graph based on incoming data strings"""
