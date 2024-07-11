@@ -62,15 +62,15 @@ class SystemFrame(tk.Frame):
         self.show_dn.set_cmd(lambda: print("Show DN: Button function not bound"))
         self.show_dn.pack(fill="both", expand=True)
 
-        self.connect = ControlPair(self, button_text="Connect")
-        self.connect.set_cmd(lambda: print("Connect: Button function not bound"))
-        self.connect.pack(fill="both", expand=True)
+        self.probe_status = ControlPair(self, button_text="Probe Status")
+        self.probe_status.set_cmd(lambda: print("Probe Status: Button function not bound"))
+        self.probe_status.pack(fill="both", expand=True)
 
     def set_button_command(self, button_name, command):
         """Set the command for a specific button
         
         Valid button names: run, stop, balance, 
-        extbus, mq dump, show dn, connect"""
+        extbus, mq dump, show dn, probe status"""
         button_name = button_name.lower()
         if button_name == "run":
             self.run.set_cmd(command)
@@ -84,14 +84,14 @@ class SystemFrame(tk.Frame):
             self.mq_dump.set_cmd(command)
         elif button_name == "show dn":
             self.show_dn.set_cmd(command)
-        elif button_name == "connect":
-            self.connect.set_cmd(command)
+        elif button_name == "probe status":
+            self.probe_status.set_cmd(command)
             
     def set_led(self, led_name, is_on: bool):
         """Set the state of a specific LED
         
         Valid LED names: run, stop, balance, 
-        extbus, mq dump, show dn, connect"""
+        extbus, mq dump, show dn, probe status"""
         led_name = led_name.lower()
         if led_name == "run":
             self.run.set_led(is_on)
@@ -105,14 +105,14 @@ class SystemFrame(tk.Frame):
             self.mq_dump.set_led(is_on)
         elif led_name == "show dn":
             self.show_dn.set_led(is_on)
-        elif led_name == "connect":
-            self.connect.set_led(is_on)
+        elif led_name == "probe status":
+            self.probe_status.set_led(is_on)
             
     def get_led(self, led_name):
         """Get the state of a specific LED
         
         Valid LED names: run, stop, balance, 
-        extbus, mq dump, show dn, connect"""
+        extbus, mq dump, show dn, probe status"""
         led_name = led_name.lower()
         if led_name == "run":
             return self.run.is_on
@@ -126,8 +126,8 @@ class SystemFrame(tk.Frame):
             return self.mq_dump.is_on
         elif led_name == "show dn":
             return self.show_dn.is_on
-        elif led_name == "connect":
-            return self.connect.is_on
+        elif led_name == "probe status":
+            return self.probe_status.is_on
             
 class DiagnosticFrame(tk.Frame):
     """Column of diagnostic controls"""
@@ -370,7 +370,7 @@ class ControlsFrame(tk.Frame):
         
         Valid Buttons:
         - balance
-        - connect
+        - probe status
         - debug
         - debug2
         - error
@@ -393,7 +393,7 @@ class ControlsFrame(tk.Frame):
         - last err
         - pvm"""
         widget_name = widget_name.lower()
-        if widget_name in ["balance", "connect", "extbus", "mq dump", "run", "show dn", "stop"]:
+        if widget_name in ["balance", "probe status", "extbus", "mq dump", "run", "show dn", "stop"]:
             if isinstance(data, bool):
                 self.sys.set_led(widget_name, data)
             else:
@@ -418,10 +418,10 @@ class ControlsFrame(tk.Frame):
         """Bind function to GUI button
         
         Valid Buttons: 
-        balance, connect, debug, debug2, error, extbus, info, 
+        balance, probe status, debug, debug2, error, extbus, info, 
         log cpi, mq dump, run, show dn, stop, trace, trace2"""
         widget_name = widget_name.lower()
-        if widget_name in ["balance", "connect", "extbus", "mq dump", "run", "show dn", "stop"]:
+        if widget_name in ["balance", "probe status", "extbus", "mq dump", "run", "show dn", "stop"]:
             self.sys.set_button_command(widget_name, func)
         elif widget_name in ["debug", "debug2", "error", "info", "log cpi", "trace", "trace2"]:
             self.diag.set_button_command(widget_name, func)
@@ -431,12 +431,12 @@ class ControlsFrame(tk.Frame):
     def get_led(self, widget_name):
         """Get the state of a specific LED
         
-        Valid LED names: balance, connect, debug, debug2, 
+        Valid LED names: balance, probe status, debug, debug2, 
         error, extbus, info, log cpi, mq dump, run, 
         show dn, stop, trace, trace2"""
-        #FIXME connect and log cpi are not setup, will return None
+        #FIXME log cpi are not setup, will return None
         widget_name = widget_name.lower()
-        if widget_name in ["balance", "connect", "extbus", "mq dump", "run", "show dn", "stop"]:
+        if widget_name in ["balance", "probe status", "extbus", "mq dump", "run", "show dn", "stop"]:
             return self.sys.get_led(widget_name)
         elif widget_name in ["debug", "debug2", "error", "info", "log cpi", "trace", "trace2"]:
             return self.diag.get_led(widget_name)
@@ -625,7 +625,7 @@ class VSBGUI(tk.Tk):
         
         Valid Buttons: balance, connect, debug, debug2, 
         error, extbus, info, log cpi, mq dump, run, 
-        show dn, stop, trace, trace2, clear err"""
+        show dn, stop, trace, trace2, clear err, probe status"""
         name = name.lower()
         if name == "clear err":
             self.controls.stat.set_clear_func(func)
@@ -653,14 +653,15 @@ class VSBGUI(tk.Tk):
         - show dn
         - stop
         - trace
-        - trace2"""
+        - trace2
+        - probe status"""
         
         if widget_name == "log cpi":
             self.filebrowser.set_button_state(state)
         elif widget_name == "connect":
             self.serial_setup.connect_button.set_led(state)
         elif widget_name in ["balance", "extbus", "mq dump", "run", "show dn", "stop", 
-                             "debug", "debug2", "error", "info", "trace", "trace2"]:
+                             "debug", "debug2", "error", "info", "trace", "trace2", "probe status"]:
             self.controls.set_data(widget_name, state)
     
     def update_statistic(self, widget_name, data: str):
@@ -691,7 +692,7 @@ class VSBGUI(tk.Tk):
         
         Valid LED names: balance, connect, debug, debug2, 
         error, extbus, info, log cpi, mq dump, run, 
-        show dn, stop, trace, trace2"""
+        show dn, stop, trace, trace2, probe status"""
         if widget_name == "connect":
             return self.serial_setup.connect_button.is_on
         elif widget_name == "log cpi":
