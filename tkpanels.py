@@ -352,7 +352,7 @@ class CLIFrame(tk.Frame):
         
     def get_entry(self):
         """NOTE: Clears entry after returns"""
-        data = self.in_str.get() + '\n'
+        data = self.in_str.get()
         self.in_str.set("")
         return data
 
@@ -620,6 +620,12 @@ class VSBGUI(tk.Tk):
         """Bind custom function on exit"""
         self.exit_button.config(command=func)
         self.protocol("WM_DELETE_WINDOW", func)
+    
+    def bind_terminal_send(self, func):
+        """Bind function to terminal send
+        
+        Expects function with signature: func() -> str"""
+        self.terminal.set_send_func(func)
     
     def bind_button(self, name, func):
         """Bind function to a GUI control panel button.

@@ -34,6 +34,7 @@ class VSBApp(threading.Thread):
             
         self.gui.bind_button("connect", self.connect_serial)
         self.gui.bind_button("log cpi", self.toggle_logger)
+        self.gui.bind_terminal_send(lambda _: self.write(self.gui.terminal.get_entry()))
         
         def send(if_false: str, if_true: str, led_name: str):
             """Send if_true if LED is off, else if_false"""
