@@ -9,6 +9,7 @@ import serial
 import time
 from tkpanels import VSBGUI
 from myserial import SerialLogger
+import re
 
 class VSBApp(threading.Thread):
     """Controller thread for managing serial, logging, and GUI 
@@ -56,7 +57,7 @@ class VSBApp(threading.Thread):
         
     def gui_update_buttons(self, data: str):
         """Update GUI buttons based on incoming data strings"""
-        # FIXME hardcoded based on current firmware print statements
+        # FIXME hardcoded strings
         
         # run/stop
         if "RN:" in data:
@@ -122,8 +123,15 @@ class VSBApp(threading.Thread):
         
     def gui_update_stats(self, data: str):
         """Update GUI stats based on incoming data strings"""
-        # FIXME hardcoded based on current firmware print statements
+        # FIXME hardcoded strings
         pass  # TODO
+    
+    def gui_update_graph(self, data: str):
+        """Update GUI graph based on incoming data strings"""
+        # FIXME hardcoded strings
+        if "DBG CV" in data:
+            x, ch, y = [int(num) for num in re.findall(r'\d+', data)][-3:]
+            self.gui.update_graph(ch, x, y)
         
     def run(self):
         """Serial read loop for updating app"""
@@ -135,7 +143,7 @@ class VSBApp(threading.Thread):
                     self.gui.update_terminal(data)
                     self.gui_update_buttons(data)
                     self.gui_update_stats(data)
-                    # TODO (if cv_data) update graph
+                    self.gui_update_graph(data)
                     if self.gui.filebrowser.enabled:
                         self.logger.log_rx(data)
                 else:
