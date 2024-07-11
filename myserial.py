@@ -71,7 +71,8 @@ class SerialLogger:
         self.__log(data, 'RX')
     
     def close(self):
-        self.file.close()
+        if self.file:
+            self.file.close()
     
     def __del__(self):
         self.close()
