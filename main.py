@@ -36,6 +36,7 @@ class VSBApp(threading.Thread):
         self.gui.bind_button("connect", self.connect_serial)
         self.gui.bind_button("log cpi", self.toggle_logger)
         self.gui.bind_terminal_send(lambda _: self.write(self.gui.terminal.get_entry()))
+        self.gui.bind_button("clear err", lambda: self.write("ER"))  # FIXME maybe not "ER"
         
         def send(if_false: str, if_true: str, led_name: str):
             """Send if_true if LED is off, else if_false"""
@@ -124,8 +125,24 @@ class VSBApp(threading.Thread):
     def gui_update_stats(self, data: str):
         """Update GUI stats based on incoming data strings"""
         # FIXME hardcoded strings
-        pass  # TODO
-    
+        try:
+            status = data.split(":")[-1].strip()
+        except Exception:
+            return
+        
+        if   "PVM state :" in data:
+            self.gui.update_statistic("pvm", status)
+        elif "CTC state :" in data:
+            self.gui.update_statistic("ctc", status)
+        elif "Last CV   :" in data:
+            self.gui.update_statistic("last cv", status)
+        elif "Last CV DN:" in data:
+            self.gui.update_statistic("last cv dn", status)
+        elif "Err count :" in data:
+            self.gui.update_statistic("errs", status)
+        elif "Last Error:" in data:
+            self.gui.update_statistic("last err", status)
+            
     def gui_update_graph(self, data: str):
         """Update GUI graph based on incoming data strings"""
         # FIXME hardcoded strings
@@ -135,6 +152,16 @@ class VSBApp(threading.Thread):
         
     def run(self):
         """Serial read loop for updating app"""
+        
+        def probe_stats(app, sec_freq):
+            """Probe stats every N seconds infinitely"""
+            while True:
+                app.write("SS")
+                time.sleep(sec_freq)
+        timer_thread = threading.Thread(target=probe_stats, args=(self, 4))
+        timer_thread.daemon = True
+        timer_thread.start()
+        
         self.running = True
         while self.running:
             try:
