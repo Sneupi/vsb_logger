@@ -524,7 +524,6 @@ class VSBGUI(tk.Tk):
         self.title("VSB Logger")
         self.geometry("1400x700")
         self.resizable(False, False)
-        self.protocol("WM_DELETE_WINDOW", lambda: self.quit() or self.destroy())
 
         self.controls = ControlsFrame(self)
         self.controls.place(relx=0, rely=0, relwidth=0.45, relheight=0.3)
@@ -544,8 +543,17 @@ class VSBGUI(tk.Tk):
         self.help_button = tk.Button(self, text="HELP", command=self.spawn_help)
         self.help_button.place(relx=0.8, rely=0, relwidth=0.1, relheight=0.05)
         
-        self.exit_button = tk.Button(self, text="EXIT", command=lambda: self.quit() or self.destroy())
+        self.exit_button = tk.Button(self, text="EXIT")
         self.exit_button.place(relx=0.9, rely=0, relwidth=0.1, relheight=0.05)
+
+        self.set_closing()
+        
+    def set_closing(self, func=None):
+        """If func not None, calls function 
+        following default exit behavior."""
+        cmd = lambda: self.quit() or self.destroy() or (func() if func else None)
+        self.exit_button.config(command=cmd) 
+        self.protocol("WM_DELETE_WINDOW", cmd)
     
     def spawn_help(self):
         """Spawn a help window"""
