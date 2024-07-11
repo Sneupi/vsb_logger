@@ -479,9 +479,8 @@ class FileBrowser(tk.Frame):
         self.browse_button = tk.Button(self, text="Select File", command=self.select_file)
         self.browse_button.place(relx=0, rely=0, relwidth=0.15, relheight=1)
         
-        self.toggle_func = toggle_func
-        self.action_name = action_name
-        self.action_button = tk.Button(self, text=f"{action_name} OFF", bg="red", command=self.toggle_action)
+        self.action_button = tk.Button(self, command=self.toggle_action)
+        self.bind_action(action_name, toggle_func)
         self.action_button.place(relx=0.15, rely=0, relwidth=0.15, relheight=1)
         
         self.label = tk.Label(self, borderwidth=2, relief="groove")
@@ -493,17 +492,25 @@ class FileBrowser(tk.Frame):
             self.label.config(text=path)
     
     def toggle_action(self):
+        """Execute the toggle_function bound to the button.
+        
+        Expected function signature: func() -> bool"""
         if not self.toggle_func:
             print("Action function not bound.")
             return
-        turn_on = self.toggle_func()
+        self.set_button_state(self.toggle_func())
+        
+    def set_button_state(self, turn_on: bool):
+        """Set state of GUI action button"""
+        self.enabled = turn_on
         self.action_button.config(bg="light green" if turn_on else "red")
         self.action_button.config(text="{} {}".format(self.action_name, "ON" if turn_on else "OFF"))
         
-    def bind_action(self, action_name, bool_func):
+    def bind_action(self, action_name, toggle_func):
         self.action_name = action_name
-        self.toggle_func = bool_func
-        self.action_button.config(text=f"{action_name} OFF", bg="red")
+        self.toggle_func = toggle_func
+        self.enabled = False
+        self.set_button_state(self.enabled)
             
     def get_path(self):
         return self.label.cget("text")
