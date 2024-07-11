@@ -108,15 +108,22 @@ class VSBApp(threading.Thread):
         elif "DT:" in data and "disabled" in data:
             self.gui.update_button("trace", False)
         # trace2  # TODO trace2
-        # info  # TODO info
+        # info
+        elif data == "AD n         Immediate ADC DAQ from channel n":
+            self.gui.update_button("info", True)
+        elif data == "XE           Enable extension bus":
+            self.gui.update_button("info", False)
         # error
         elif "EE:" in data and "enabled" in data:
             self.gui.update_button("error", True)
         
         elif "DE:" in data and "disabled" in data:
             self.gui.update_button("error", False)
-        # log cpi  # TODO log cpi
         
+    def gui_update_stats(self, data: str):
+        """Update GUI stats based on incoming data strings"""
+        # FIXME hardcoded based on current firmware print statements
+        pass  # TODO
         
     def run(self):
         """Serial read loop for updating app"""
@@ -127,14 +134,14 @@ class VSBApp(threading.Thread):
                     data = self.ser.readline().decode('utf-8').strip()
                     self.gui.update_terminal(data)
                     self.gui_update_buttons(data)
-                    # TODO (if stats) update stats
+                    self.gui_update_stats(data)
                     # TODO (if cv_data) update graph
                     if self.gui.filebrowser.enabled:
                         self.logger.log_rx(data)
                 else:
                     time.sleep(0.01)  # Prevent CPU hogging
             except OSError as e:
-                pass  # Serial port closed
+                pass  # FIXME workaround, avoid err spam on changed serial
             except Exception as e:
                 self.print_error(e)
                 
