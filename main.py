@@ -11,6 +11,28 @@ from tkpanels import VSBGUI
 from myserial import SerialLogger
 import re
 
+class ProbeThread(threading.Thread):
+    """Stoppable thread for probing stats every N seconds"""
+    def __init__(self, app: 'VSBApp', sec_freq):
+        super().__init__()
+        self.app = app
+        self.sec_freq = sec_freq
+        self.running = False
+        self.daemon = True
+        
+    def run(self):
+        self.running = True
+        while self.running:
+            self.app.write("SS")
+            time.sleep(self.sec_freq)
+            
+    def stop(self):
+        self.running = False
+        del self
+        
+    def __del__(self):
+        self.stop()
+
 class VSBApp(threading.Thread):
     """Controller thread for managing serial, logging, and GUI 
     components of the VSB logger and plotter.
@@ -25,6 +47,7 @@ class VSBApp(threading.Thread):
         self.gui = gui
         self.ser = None
         self.logger = None
+        self.probe_thread = None
         
         self.daemon = True  # threading.Thread
         self.bind_functions()
@@ -42,6 +65,7 @@ class VSBApp(threading.Thread):
             """Send if_true if LED is off, else if_false"""
             self.write(if_true if self.gui.get_led(led_name) else if_false)
                 
+        self.gui.bind_button("probe status", self.toggle_probe)
         self.gui.bind_button("run", lambda: send("RN", "ST", "run"))
         self.gui.bind_button("stop", lambda: send("ST", "RN", "stop"))
         self.gui.bind_button("balance", lambda: send("EB", "DB", "balance"))
@@ -153,15 +177,6 @@ class VSBApp(threading.Thread):
     def run(self):
         """Serial read loop for updating app"""
         
-        def probe_stats(app, sec_freq):
-            """Probe stats every N seconds infinitely"""
-            while True:
-                app.write("SS")
-                time.sleep(sec_freq)
-        timer_thread = threading.Thread(target=probe_stats, args=(self, 4))
-        timer_thread.daemon = True
-        timer_thread.start()
-        
         self.running = True
         while self.running:
             try:
@@ -232,6 +247,24 @@ class VSBApp(threading.Thread):
             except Exception as e:
                 self.print_error(e)
                 return False
+
+    def probe_create(self):
+        if not self.probe_thread:
+            self.probe_thread = ProbeThread(self, 3)
+            self.probe_thread.start()
+            
+    def probe_destroy(self):
+        if self.probe_thread:
+            self.probe_thread.stop()
+            self.probe_thread = None
+            
+    def toggle_probe(self):
+        if self.gui.get_led("probe status"):
+            self.probe_destroy()
+            self.gui.update_button("probe status", False)
+        else:
+            self.probe_create()
+            self.gui.update_button("probe status", True)
         
     def __del__(self):
         self.stop()
