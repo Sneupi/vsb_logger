@@ -570,7 +570,13 @@ class VSBGUI(tk.Tk):
         Valid Buttons: balance, connect, debug, debug2, 
         error, extbus, info, log cpi, mq dump, run, 
         show dn, stop, trace, trace2"""
-        self.controls.bind_func(name, func)
+        name = name.lower()
+        if name == "connect":
+            self.serial_setup.bind_connect(func)
+        elif name == "log cpi":
+            self.filebrowser.bind_action("Log CPI", func)
+        else:
+            self.controls.bind_func(name, func)
 
     def update_control(self, widget_name, data):
         """Update widget on control panel with new data."""
