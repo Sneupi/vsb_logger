@@ -84,8 +84,8 @@ class SystemFrame(tk.Frame):
             self.mq_dump.set_cmd(command)
         elif button_name == "show dn":
             self.show_dn.set_cmd(command)
-        elif button_name == "connect":
-            self.connect.set_cmd(command)
+        # elif button_name == "connect":
+        #     self.connect.set_cmd(command)
             
     def set_led(self, led_name, is_on: bool):
         """Set the state of a specific LED
@@ -105,8 +105,29 @@ class SystemFrame(tk.Frame):
             self.mq_dump.set_led(is_on)
         elif led_name == "show dn":
             self.show_dn.set_led(is_on)
-        elif led_name == "connect":
-            self.connect.set_led(is_on)
+        # elif led_name == "connect":
+        #     self.connect.set_led(is_on)
+            
+    def get_led(self, led_name):
+        """Get the state of a specific LED
+        
+        Valid LED names: run, stop, balance, 
+        extbus, mq dump, show dn, connect"""
+        led_name = led_name.lower()
+        if led_name == "run":
+            return self.run.is_on
+        elif led_name == "stop":
+            return self.stop.is_on
+        elif led_name == "balance":
+            return self.balance.is_on
+        elif led_name == "extbus":
+            return self.extbus.is_on
+        elif led_name == "mq dump":
+            return self.mq_dump.is_on
+        elif led_name == "show dn":
+            return self.show_dn.is_on
+        # elif led_name == "connect":
+        #     return self.connect.is_on
             
 class DiagnosticFrame(tk.Frame):
     """Column of diagnostic controls"""
@@ -159,8 +180,8 @@ class DiagnosticFrame(tk.Frame):
             self.info.set_cmd(command)
         elif button_name == "error":
             self.error.set_cmd(command)
-        elif button_name == "log cpi":
-            self.log_cpi.set_cmd(command)
+        # elif button_name == "log cpi":
+        #     self.log_cpi.set_cmd(command)
             
     def set_led(self, led_name, is_on: bool):
         """Set the state of a specific LED
@@ -180,8 +201,29 @@ class DiagnosticFrame(tk.Frame):
             self.info.set_led(is_on)
         elif led_name == "error":
             self.error.set_led(is_on)
-        elif led_name == "log cpi":
-            self.log_cpi.set_led(is_on)
+        # elif led_name == "log cpi":
+        #     self.log_cpi.set_led(is_on)
+    
+    def get_led(self, led_name):
+        """Get the state of a specific LED
+        
+        Valid LED names: debug, debug2, trace, 
+        trace2, info, error, log cpi"""
+        led_name = led_name.lower()
+        if led_name == "debug":
+            return self.debug.is_on
+        elif led_name == "debug2":
+            return self.debug2.is_on
+        elif led_name == "trace":
+            return self.trace.is_on
+        elif led_name == "trace2":
+            return self.trace2.is_on
+        elif led_name == "info":
+            return self.info.is_on
+        elif led_name == "error":
+            return self.error.is_on
+        # elif led_name == "log cpi":
+        #     return self.log_cpi.is_on
 
 class StatePair(tk.Frame):
     """Frame with a label and a readout field"""
@@ -392,6 +434,21 @@ class ControlsFrame(tk.Frame):
             self.diag.set_button_command(widget_name, func)
         else:
             raise ValueError("Invalid widget name.")
+        
+    def get_led(self, widget_name):
+        """Get the state of a specific LED
+        
+        Valid LED names: balance, connect, debug, debug2, 
+        error, extbus, info, log cpi, mq dump, run, 
+        show dn, stop, trace, trace2"""
+        #FIXME connect and log cpi are not setup, will return None
+        widget_name = widget_name.lower()
+        if widget_name in ["balance", "connect", "extbus", "mq dump", "run", "show dn", "stop"]:
+            return self.sys.get_led(widget_name)
+        elif widget_name in ["debug", "debug2", "error", "info", "log cpi", "trace", "trace2"]:
+            return self.diag.get_led(widget_name)
+        else:
+            raise ValueError("Invalid widget name.")
  
 class SerialSetup(tk.Frame):
     """User interface for setting up serial connection
@@ -590,6 +647,19 @@ class VSBGUI(tk.Tk):
         """Add new data (x, y) to graph.
         Plots and shifts graph if necessary."""
         self.graph.add_datapoint(channel, x, y)
+    
+    def get_led(self, widget_name):
+        """Get the state of a specific LED
+        
+        Valid LED names: balance, connect, debug, debug2, 
+        error, extbus, info, log cpi, mq dump, run, 
+        show dn, stop, trace, trace2"""
+        if widget_name == "connect":
+            return self.serial_setup.connect_button.is_on
+        elif widget_name == "log cpi":
+            return self.filebrowser.enabled
+        else:
+            return self.controls.get_led(widget_name)
 
 class VSBHelpTopLevel(tk.Toplevel):
     def __init__(self, master):
