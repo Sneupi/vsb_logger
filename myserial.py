@@ -76,8 +76,11 @@ class SerialLogger:
         self.__log(data, 'RX')
     
     def close(self):
-        if self.file:
-            self.file.close()
+        try:
+            if self.file:
+                self.file.close()
+        except Exception:
+            pass  # File already closed
     
     def __del__(self):
         self.close()
