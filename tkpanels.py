@@ -546,9 +546,9 @@ class VSBGUI(tk.Tk):
         self.exit_button = tk.Button(self, text="EXIT")
         self.exit_button.place(relx=0.9, rely=0, relwidth=0.1, relheight=0.05)
 
-        self.set_closing()
+        self.call_on_exit(None)  # Default behavior
         
-    def set_closing(self, func=None):
+    def call_on_exit(self, func=None):
         """If func not None, calls function 
         following default exit behavior."""
         cmd = lambda: self.quit() or self.destroy() or (func() if func else None)
