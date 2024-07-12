@@ -720,65 +720,68 @@ Welcome to the VSB Logger Help!
 
 BRIEF DESCRIPTION:
 -------------------
-This application is designed to log and plot 
-serial data obtained from a Voltage Sense & 
-Balancing (VSB) unit. The key features for 
-this application have been detailed below.
+    This application is designed to log and plot 
+    serial data obtained from a Voltage Sense & 
+    Balancing (VSB) unit. The key features for 
+    this application have been detailed below.
         
 BUTTONS PANEL:
 -------------------
-A panel of VSB control buttons with LEDs 
-indicating the status of each. Each button
-is responsible for sending a respective 
-command to the VSB unit.
+    A panel of VSB control buttons with LEDs 
+    indicating the status of each. Each button
+    is responsible for sending a respective 
+    command to the VSB unit.
 
-Each button state (LED) is updated directly
-from the stream of incoming VSB data. 
-Meaning if the VSB unit sends a "balance" 
-command, the balance button will light up 
-only upon a confirmation string is received.
+    Each button state (LED) is updated directly
+    from the stream of incoming VSB data. 
+    Meaning if the VSB unit sends a "balance" 
+    command, the balance button will light up 
+    only upon a confirmation string is received.
 
-All buttons are always initialized to off. 
-Meaning initial states may not be accurate
-if connecting to an already running VSB unit
-until the VSB unit sends respective messages
-to confirm each correct state.
+    All buttons are always initialized to off. 
+    Meaning initial states may not be accurate
+    if connecting to an already running VSB unit
+    until the VSB unit sends respective messages
+    to confirm each correct state.
 
 STATUS PANEL:
 -------------------
-Note: This panel is only live when the
-"Probe Status" button is toggled on.
+    Note: This panel is only live when the
+    "Probe Status" button is toggled on.
 
-A panel of readouts for various VSB states
-taken directly from incoming VSB data strings.
+    A panel of readouts for various VSB states
+    taken directly from incoming VSB data strings.
 
 LOGGING PANEL:
 -------------------
-A file browser for selecting a file to log 
-data to, and a button to toggle logging on/off.
+    A file browser for selecting a file to log 
+    data to, and a button to toggle logging on/off.
         
 SERIAL TERMINAL:
 -------------------
-A command-line interface for displaying, 
-receiving, and sending custom commands to the 
-VSB unit.
+    A command-line interface for displaying, 
+    receiving, and sending custom commands to the 
+    VSB unit.
         
 SERIAL SETUP:
 -------------------
-A dropdown menu for selecting the serial port 
-and baud rate, discovering ports (refresh) and 
-connecting to a selected port. Note you may type 
-your own port name if it is not listed.
+    A dropdown menu for selecting the serial port 
+    and baud rate, discovering ports (refresh) and 
+    connecting to a selected port. Note you may type 
+    your own port name if it is not listed.
         
 GRAPH PANEL:
 -------------------
-Note: You may click on the graph legend labels to
-toggle the visibility of each channel.
+    Note: You may click on the graph legend labels to
+    toggle the visibility of each channel.
 
-A live-updating graph of the data being received 
-from the VSB unit. Displayed as raw DN (digital 
-number) values 0-4095 on a timescale milliseconds 
-of VSB uptime.
+    Note: x-axis width can be changed by typing and 
+    hitting enter in the entry box.
+
+    A live-updating graph of the data being received 
+    from the VSB unit. Displayed as raw DN (digital 
+    number) values 0-4095 on a timescale milliseconds 
+    of VSB uptime.
 """
 
         self.text.configure(state="normal")

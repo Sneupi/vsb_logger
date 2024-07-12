@@ -156,14 +156,28 @@ class LiveGraphFrame(tk.Frame):
         self.canvas.get_tk_widget().place(relx=0, rely=0, relwidth=1, relheight=0.95)
                 
         self.auto_shift_button = tk.Button(self, text="Enable Scroller", command=toggle_auto_shift)
-        self.auto_shift_button.place(relx=0, rely=0.95, relwidth=0.2, relheight=0.05)
+        self.auto_shift_button.place(relx=0, rely=0.95, relwidth=0.15, relheight=0.05)
             
         self.clear_graph_button = tk.Button(self, text="Clear Graph", command=self.clear_all_data)
-        self.clear_graph_button.place(relx=0.2, rely=0.95, relwidth=0.2, relheight=0.05)
-
+        self.clear_graph_button.place(relx=0.15, rely=0.95, relwidth=0.15, relheight=0.05)
+        
+        self.x_width_label = tk.Label(self, text="x_width:")
+        self.x_width_label.place(relx=0.3, rely=0.95, relwidth=0.1, relheight=0.05)
+        
+        def set_x_width(event):
+            try:
+                self.X_WIDTH = int(self.x_width_entry.get())
+            except ValueError:
+                pass
+        
+        self.x_width_entry = tk.Entry(self)
+        self.x_width_entry.insert(0, str(self.X_WIDTH))
+        self.x_width_entry.place(relx=0.4, rely=0.95, relwidth=0.1, relheight=0.05)
+        self.x_width_entry.bind("<Return>", set_x_width)
+            
         self.toolbar = NavigationToolbar2Tk(self.canvas, self)
         self.toolbar.update()
-        self.toolbar.place(relx=0.4, rely=0.95, relwidth=0.6, relheight=0.05)
+        self.toolbar.place(relx=0.5, rely=0.95, relwidth=0.5, relheight=0.05)
 
 
 if __name__ == "__main__":
