@@ -21,6 +21,7 @@ class LiveGraphFrame(tk.Frame):
         plt.subplots_adjust(bottom=0.25)
         self.line, = self.ax.plot([], [], lw=2)
         self.lines = dict()
+        self.map_legend_to_ax = dict()
         self.ax.grid()
         self.xdata, self.ydata = [], []
         self.ani = animation.FuncAnimation(self.fig, self.run, blit=False, interval=self.REFRESH_MS,
@@ -47,11 +48,33 @@ class LiveGraphFrame(tk.Frame):
                 'x': [], 
                 'y': []
             }
+            if len(self.lines) % 12 == 0:  # FIXME: Hardcoded number & bad code placement
+                leg = self.ax.legend(loc='upper left')  # Create legend once every 12 lines
+                for legend_line, ax_line in zip(leg.get_lines(), self.get_all_lines()):
+                    legend_line.set_picker(5)  # pick radius of 5
+                    self.map_legend_to_ax[legend_line] = ax_line
             
         sub = self.lines[line_name]  # Sub-dictionary
         sub['x'].append(x)
         sub['y'].append(y)
         sub['line'].set_data(sub['x'], sub['y'])
+        
+    def on_pick(self, event):
+        # On the pick event, find the original line corresponding to the legend
+        # proxy line, and toggle its visibility.
+        legend_line = event.artist
+
+        # Do nothing if the source of the event is not a legend line.
+        if legend_line not in self.map_legend_to_ax:
+            return
+
+        ax_line = self.map_legend_to_ax[legend_line]
+        visible = not ax_line.get_visible()
+        ax_line.set_visible(visible)
+        # Change the alpha on the line in the legend, so we can see what lines
+        # have been toggled.
+        legend_line.set_alpha(1.0 if visible else 0.2)
+        self.fig.canvas.draw()
         
     def get_xdata(self, line_name):
         """Get the xdata for a specific line."""
@@ -87,6 +110,7 @@ class LiveGraphFrame(tk.Frame):
         """Init function for FuncAnimation."""
         self.ax.set_ylim(0, self.Y_HEIGHT)
         self.ax.set_xlim(0, self.X_WIDTH)
+        self.fig.canvas.mpl_connect('pick_event', self.on_pick)
         self.clear_all_data()
         return self.get_all_lines()
 
@@ -112,7 +136,6 @@ class LiveGraphFrame(tk.Frame):
             mx = max(all_x)
             if self.auto_shift and mx >= xmax:
                 self.ax.set_xlim(mx-self.X_WIDTH, mx)
-                self.ax.legend()
                 self.ax.figure.canvas.draw()
 
         return self.get_all_lines()
