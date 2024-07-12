@@ -772,6 +772,9 @@ your own port name if it is not listed.
         
 GRAPH PANEL:
 -------------------
+Note: You may click on the graph legend labels to
+toggle the visibility of each channel.
+
 A live-updating graph of the data being received 
 from the VSB unit. Displayed as raw DN (digital 
 number) values 0-4095 on a timescale milliseconds 
