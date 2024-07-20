@@ -8,8 +8,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 import serial.tools.list_ports
-# from tkgraph import LiveGraphFrame
-from tkgraph2 import LiveGraphFrame
+from graph import LiveGraphFrame
 
 class ControlPair(tk.Frame):
     """Frame with a button and an indicator"""
