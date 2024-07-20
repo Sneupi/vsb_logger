@@ -4,8 +4,14 @@ from live_graph import LiveGraph
 import datetime
 
 class LiveGraphFrame(tk.Frame):
-    """Frame for displaying and interfacing 
-    with a LiveGraph using tkinter."""
+    """Generic tkinter.Frame interface for LiveGraph class.
+    
+    NOTE: This example enforces datetime units of width."""
+        
+    def append(self, line_name, y):
+        x = datetime.datetime.now()
+        self.graph.append(line_name, x, y)
+        
     def __init__(self, master, interval=100):
         super().__init__(master)
         
@@ -75,12 +81,8 @@ class LiveGraphFrame(tk.Frame):
         self.grid_columnconfigure(7, weight=1)
         self.grid_columnconfigure(8, weight=1)
         self.grid_columnconfigure(9, weight=1)
-        
-    def append(self, line_name, y):
-        x = datetime.datetime.now()
-        self.graph.append(line_name, x, y)
-    
-if __name__ == "__main__":    
+
+def __demo_tkinter():
     import threading
     import time
     import datetime
@@ -105,3 +107,4 @@ if __name__ == "__main__":
     root.protocol("WM_DELETE_WINDOW", lambda: root.quit() or root.destroy())
     root.mainloop()
 
+__demo_tkinter()
