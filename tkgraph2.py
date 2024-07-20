@@ -1,0 +1,91 @@
+import tkinter as tk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+from live_graph import LiveGraph
+import datetime
+
+class LiveGraphFrame(tk.Frame):
+    """Frame for displaying and interfacing 
+    with a LiveGraph using tkinter."""
+    def __init__(self, master, interval=100):
+        super().__init__(master)
+        
+        def toggle_auto():
+            self.graph.set_auto(not self.graph.is_auto)
+            txt = "Autoshift " + ("ON" if self.graph.is_auto else "OFF")
+            self.auto_button.config(text=txt)
+        
+        def manual_scroll(event):
+            self.graph.limits.set_xlim_to_relx(self.scroll_slider.get()/100)
+            
+        def update_width(event=None):
+            time_units = {
+                "Seconds": 1,
+                "Minutes": 60,
+                "Hours": 3600,
+                "Days": 86400
+            }
+            unit = self.unit_var.get()
+            width = self.width_slider.get() * time_units[unit]
+            self.graph.set_width(datetime.timedelta(seconds=width))
+            
+        self.graph = LiveGraph(width=datetime.timedelta(seconds=10), interval=interval)
+        self.canvas = FigureCanvasTkAgg(self.graph.fig, master=self)
+        self.canvas.get_tk_widget().grid(row=0, column=0, columnspan=10, sticky=tk.NSEW)
+            
+        self.auto_button = tk.Button(self, text="Autoshift ON", command=toggle_auto)
+        self.auto_button.grid(row=1, column=0, columnspan=2, sticky=tk.NSEW)
+        
+        self.scroll_slider = tk.Scale(self, from_=0, to=100, orient=tk.HORIZONTAL)
+        self.scroll_slider.bind("<B1-Motion>", manual_scroll)
+        self.scroll_slider.grid(row=1, column=2, columnspan=8, sticky=tk.NSEW)
+        
+        time_units = ["Seconds", "Minutes", "Hours", "Days"]
+        self.unit_var = tk.StringVar(self)
+        self.unit_var.set(time_units[0])
+        self.unit_menu = tk.OptionMenu(self, self.unit_var, *time_units)
+        self.unit_menu.grid(row=2, column=0, sticky=tk.NSEW)
+        
+        self.unit_updater_button = tk.Button(self, text="Update Units", 
+                                             command=update_width)
+        self.unit_updater_button.grid(row=2, column=1, sticky=tk.NSEW)
+        
+        self.width_slider = tk.Scale(self, from_=1, to=100, orient=tk.HORIZONTAL)
+        self.width_slider.grid(row=2, column=2, columnspan=8, sticky=tk.NSEW)
+        self.width_slider.bind("<B1-Motion>", update_width)
+        
+        self.clear_button = tk.Button(self, text="Clear Graph", command=self.graph.clear)
+        self.clear_button.grid(row=3, column=0, columnspan=2, sticky=tk.NSEW)
+    
+        self.toolbar = NavigationToolbar2Tk(self.canvas, self, pack_toolbar=False)
+        self.toolbar.update()
+        self.toolbar.grid(row=4, column=0, columnspan=10, sticky=tk.NSEW)
+        
+    def append(self, line_name, y):
+        x = datetime.datetime.now()
+        self.graph.append(line_name, x, y)
+    
+if __name__ == "__main__":    
+    import threading
+    import time
+    import datetime
+    import random
+    
+    def thread_func(graph: LiveGraphFrame):
+        """Simulate graphing data coming in from a source"""
+        while True:
+            for i in range(12):
+                v = random.randint(341*i, 341*(i+1))
+                graph.append(f"{i}", v)
+                time.sleep(0.07)
+    
+    root = tk.Tk()
+    gph = LiveGraphFrame(root)
+    gph.pack(fill=tk.BOTH, expand=True)
+                
+    thread = threading.Thread(target=thread_func, args=(gph,))
+    thread.daemon = True
+    thread.start()
+    
+    root.protocol("WM_DELETE_WINDOW", lambda: root.quit() or root.destroy())
+    root.mainloop()
+
