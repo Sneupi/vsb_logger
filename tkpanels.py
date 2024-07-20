@@ -8,7 +8,8 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 import serial.tools.list_ports
-from tkgraph import LiveGraphFrame
+# from tkgraph import LiveGraphFrame
+from tkgraph2 import LiveGraphFrame
 
 class ControlPair(tk.Frame):
     """Frame with a button and an indicator"""
@@ -587,7 +588,7 @@ class VSBGUI(tk.Tk):
         self.terminal = CLIFrame(self)
         self.terminal.place(relx=0.01, rely=0.36, relwidth=0.43, relheight=0.58)
         
-        self.graph = LiveGraphFrame(self, x_width=10000, refresh_ms=1000)
+        self.graph = LiveGraphFrame(self)
         self.graph.place(relx=0.45, rely=0.05, relwidth=0.55, relheight=0.95)
         
         self.help_button = tk.Button(self, text="HELP", command=self.spawn_help)
@@ -685,7 +686,7 @@ class VSBGUI(tk.Tk):
     def update_graph(self, channel: str, x: int, y: int):
         """Add new data (x, y) to graph.
         Plots and shifts graph if necessary."""
-        self.graph.add_datapoint(channel, x, y)
+        self.graph.append(channel, y)
     
     def get_led(self, widget_name):
         """Get the state of a specific LED
@@ -772,16 +773,20 @@ SERIAL SETUP:
         
 GRAPH PANEL:
 -------------------
-    Note: You may click on the graph legend labels to
-    toggle the visibility of each channel.
-
-    Note: x-axis width can be changed by typing and 
-    hitting enter in the entry box.
-
     A live-updating graph of the data being received 
     from the VSB unit. Displayed as raw DN (digital 
-    number) values 0-4095 on a timescale milliseconds 
-    of VSB uptime.
+    number) values 0-4095 on an adjustable timescale.
+    
+    Notes: 
+    - The first slider (top) controls the 
+    manual scroll behavior when autoshift is off.
+    - The second slider (bottom) controls the 
+    width of the x-axis in the units selected.
+    - Graph legend labels can be clicked to 
+    toggle channel visibility.
+    - The "Update Units" button must be pressed
+    after changing units in the dropdown for it to
+    take effect.
 """
 
         self.text.configure(state="normal")

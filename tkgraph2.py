@@ -60,6 +60,22 @@ class LiveGraphFrame(tk.Frame):
         self.toolbar.update()
         self.toolbar.grid(row=4, column=0, columnspan=10, sticky=tk.NSEW)
         
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(2, weight=1)
+        self.grid_rowconfigure(3, weight=1)
+        self.grid_rowconfigure(4, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure(2, weight=1)
+        self.grid_columnconfigure(3, weight=1)
+        self.grid_columnconfigure(4, weight=1)
+        self.grid_columnconfigure(5, weight=1)
+        self.grid_columnconfigure(6, weight=1)
+        self.grid_columnconfigure(7, weight=1)
+        self.grid_columnconfigure(8, weight=1)
+        self.grid_columnconfigure(9, weight=1)
+        
     def append(self, line_name, y):
         x = datetime.datetime.now()
         self.graph.append(line_name, x, y)
