@@ -98,9 +98,16 @@ class LimitHandler:
         self.ymax = None
         self.ymin = None
         self.width = width
+        self.cur_x = None  # halfway of upper & lower
         
     def set_width(self, width):
         self.width = width
+        # update xlim to new width, using current x position
+        if self.cur_x:
+            x = self.cur_x
+            dt = self.width//2
+            lower, upper = self._bounded(x-dt, x+dt)
+            self._set_xlim(lower, upper)
         
     def track_data(self, x, y):
         """Compare new x, y values to tracked limits,
@@ -141,14 +148,20 @@ class LimitHandler:
         x = self._relx_to_x(percent)
         dt = self.width//2
         lower, upper = self._bounded(x-dt, x+dt)
-        self.ax.set_xlim(lower, upper)
+        self._set_xlim(lower, upper)
         
     def set_xlim_to_newest(self):
         """Set the x-axis limits to view the newest data."""
         if self.xmax is None or self.xmin is None:
             return
         lower, upper = self._bounded(self.xmax-self.width, self.xmax)
+        self._set_xlim(lower, upper)
+        
+    def _set_xlim(self, lower, upper):
+        """Wrapper for setting x-axis limits.
+        Also updates the current x position."""
         self.ax.set_xlim(lower, upper)
+        self.cur_x = lower + (upper-lower)/2
     
     def _relx_to_x(self, relx: float):
         """Convert relative x (0.0 - 1.0) to a real x position."""
@@ -236,7 +249,7 @@ class LiveGraphFrame(tk.Frame):
             self.auto_button.config(text=txt)
         
         def manual_scroll(event):
-            self.graph.limits.set_xlim_to_relx(self.scroll_slider.get()/100)
+            self.graph.set_xlim_to_relx(self.scroll_slider.get()/100)
             
         def update_width(event=None):
             time_units = {
