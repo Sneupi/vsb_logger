@@ -147,8 +147,6 @@ class SerialSetup(tk.Frame):
     func(port: str, baud: int) -> bool"""
     def __init__(self, parent, connect_func=None):
         super().__init__(parent)
-        if not connect_func:
-            connect_func = lambda: print("connect_func not bound")
         
         self.port_label = tk.Label(self, text="Port:")
         self.port_label.pack(side='left', padx=5, pady=5)
@@ -172,8 +170,7 @@ class SerialSetup(tk.Frame):
         self.refresh_button = tk.Button(self, text="Refresh Ports", command=self.refresh_ports)
         self.refresh_button.pack(side='right', padx=5, pady=5)
         
-        self.connect_button = ControlPair(self, text="Connect")
-        self.connect_button.configure(command=connect_func)
+        self.connect_button = ControlPair(self, text="Connect",  command=connect_func)
         self.connect_button.pack(side='right', padx=5, pady=5, fill='both', expand=True)
         
     def set_connect_func(self, func):
