@@ -51,7 +51,7 @@ class CLIFrame(tk.Frame):
         super().__init__(master)
         super().configure(width=400, height=400)
         if not send_func:
-            send_func = lambda _: print("CLIFrame send_func not bound")
+            send_func = lambda _: print("send_func not bound")
         
         self.in_str = tk.StringVar()
         self.in_txt = tk.Entry(self, textvariable=self.in_str)
@@ -106,6 +106,7 @@ class VSBPanelFrame(tk.Frame):
     """Controls panel for Voltage Sense & Balance (VSB) unit"""
     def __init__(self, master):
         super().__init__(master)
+        # TODO
  
 class SerialSetup(tk.Frame):
     """User interface for setting up serial connection
@@ -115,6 +116,8 @@ class SerialSetup(tk.Frame):
     func(port: str, baud: int) -> bool"""
     def __init__(self, parent, connect_func=None):
         super().__init__(parent)
+        if not connect_func:
+            connect_func = lambda: print("connect_func not bound")
         
         self.port_label = tk.Label(self, text="Port:")
         self.port_label.pack(side='left', padx=5, pady=5)
@@ -138,44 +141,30 @@ class SerialSetup(tk.Frame):
         self.refresh_button = tk.Button(self, text="Refresh Ports", command=self.refresh_ports)
         self.refresh_button.pack(side='right', padx=5, pady=5)
         
-        self.connect_func = connect_func
         self.connect_button = ControlPair(self, button_text="Connect")
-        self.connect_button.set_command(self.connect)
+        self.connect_button.set_command(connect_func)
         self.connect_button.pack(side='right', padx=5, pady=5, fill='both', expand=True)
         
-    def bind_connect(self, func):
-        self.connect_func = func
-        
-    def connect(self):
-        """Internal function to connect to serial port,
-        allowing button state to be updated."""
-        if not self.connect_func:
-            print("Connect function not bound.")
-            return
-        
-        port = self.get_port()
-        baud = self.get_baud()
-        
-        if port and baud:
-            try:
-                ok = self.connect_func(port, baud)
-                self.connect_button.set_led(ok)
-            except Exception as e:
-                print(f"SerialSetup Error: {e}")
+    def set_connect_func(self, func):
+        self.connect_button.set_command(command=func)
     
     def get_available_ports(self):
+        """Get system available serial port names as list"""
         ports = []
         for port in serial.tools.list_ports.comports():
             ports.append(port.device)
         return ports
     
     def get_port(self):
+        """Get selected port name string"""
         return self.port_var.get()
     
     def get_baud(self):
+        """Get selected baud rate string"""
         return self.baud_var.get()
     
     def refresh_ports(self):
+        """Update dropdown with available ports"""
         self.port_options = self.get_available_ports()
         self.port_dropdown['values'] = self.port_options
 
@@ -294,7 +283,7 @@ class VSBGUI(tk.Tk):
         if name == "clear err":
             self.controls.stat.set_clear_func(func)
         elif name == "connect":
-            self.serial_setup.bind_connect(func)
+            self.serial_setup.set_connect_func(func)
         elif name == "log cpi":
             self.filebrowser.bind_action("Log CPI", func)
         else:
@@ -458,5 +447,10 @@ GRAPH PANEL:
         
 if __name__ == "__main__":
     # Example demo
-    app = VSBGUI()
-    app.mainloop()
+    # app = VSBGUI()
+    # app.mainloop()
+    
+    root= tk.Tk()
+    frame = SerialSetup(root)
+    frame.pack(fill='both', expand=True)
+    root.mainloop()
