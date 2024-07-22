@@ -172,28 +172,6 @@ class StatePairGrid(WidgetGrid):
     def _instantiation(self, text) -> tk.Widget:
         return StatePair(self, label_text=text)
 
-class VSBPanelFrame(tk.Frame):
-    """Controls panel for Voltage Sense & Balance (VSB) unit"""
-    def __init__(self, master):
-        super().__init__(master)
-        
-        
-        # list[column][row] of each type
-        ctrl_names = [["Run", "Stop", "Balance", "ExtBus", "MQ Dump", "Show DN"], 
-                      ["Debug", "Debug2", "Trace", "Trace2", "Info", "Error"]]
-        stat_names = [["PVM", "CTC", "Last CV", "Last CV DN", "Last Err", "Errs"]]
-        
-        self.ctrl_grid = ControlPairGrid(self, ctrl_names)
-        self.ctrl_grid.pack(side='left', fill='both', expand=True)
-        self.stat_grid = StatePairGrid(self, stat_names)  
-        self.stat_grid.pack(side='left', fill='both', expand=True)
-        
-    def get_controlpair(self, name):
-        return self.ctrl_grid.get_widgets().get(name, None)
-    
-    def get_statepair(self, name):
-        return self.stat_grid.get_widgets().get(name, None)
-        
 class SerialSetup(tk.Frame):
     """User interface for setting up serial connection
     
@@ -286,6 +264,28 @@ class FileBrowser(tk.Frame):
             
     def get_path(self):
         return self.label.cget("text")
+               
+class VSBPanelFrame(tk.Frame):
+    """Controls panel for Voltage Sense & Balance (VSB) unit"""
+    def __init__(self, master):
+        super().__init__(master)
+        
+        
+        # list[column][row] of each type
+        ctrl_names = [["Run", "Stop", "Balance", "ExtBus", "MQ Dump", "Show DN"], 
+                      ["Debug", "Debug2", "Trace", "Trace2", "Info", "Error"]]
+        stat_names = [["PVM", "CTC", "Last CV", "Last CV DN", "Last Err", "Errs"]]
+        
+        self.ctrl_grid = ControlPairGrid(self, ctrl_names)
+        self.ctrl_grid.pack(side='left', fill='both', expand=True)
+        self.stat_grid = StatePairGrid(self, stat_names)  
+        self.stat_grid.pack(side='left', fill='both', expand=True)
+        
+    def get_controlpair(self, name):
+        return self.ctrl_grid.get_widgets().get(name, None)
+    
+    def get_statepair(self, name):
+        return self.stat_grid.get_widgets().get(name, None)
 
 class VSBGUI(tk.Tk):
     """GUI frontend for VSB logger & plotter"""
