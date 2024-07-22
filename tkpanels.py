@@ -28,6 +28,8 @@ class ControlPair(tk.Frame):
         self.led.place(relx=0, rely=0, relwidth=0.2, relheight=1)
         self.button.place(relx=0.2, rely=0, relwidth=0.8, relheight=1)
     
+        self.config = self.configure  # Alias for configure
+    
     def configure(self, 
                   command: callable=None, 
                   led: bool=None, 
@@ -62,6 +64,8 @@ class StatePair(tk.Frame):
         
         self.readout.place(relx=0.5, rely=0, relwidth=0.5, relheight=1)  
         self.label.place(relx=0, rely=0, relwidth=0.5, relheight=1)
+        
+        self.config = self.configure  # Alias for configure
 
     def configure(self, 
                  label_text:str=None, 
@@ -247,7 +251,12 @@ class VSBGUI(tk.Tk):
         
         self.filebrowser = FileBrowser(self)
         self.filebrowser.place(relx=0, rely=0.3, relwidth=0.45, relheight=0.05)
+        self.filebrowser.set_action_name("Log CPI")
                 
+        self.scriptbrowser = FileBrowser(self)
+        self.scriptbrowser.place(relx=0, rely=0.25, relwidth=0.45, relheight=0.05)        
+        self.scriptbrowser.set_action_name("Run Script")
+
         self.serial_setup = SerialSetup(self)
         self.serial_setup.place(relx=0, rely=0.95, relwidth=0.45, relheight=0.05)
 
@@ -461,10 +470,10 @@ GRAPH PANEL:
         
 if __name__ == "__main__":
     # Example demo
-    # app = VSBGUI()
-    # app.mainloop()
+    app = VSBGUI()
+    app.mainloop()
     
-    root= tk.Tk()
-    frame = FileBrowser(root)
-    frame.pack(fill='both', expand=True)
-    root.mainloop()
+    # root= tk.Tk()
+    # frame = FileBrowser(root)
+    # frame.pack(fill='both', expand=True)
+    # root.mainloop()
