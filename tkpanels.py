@@ -198,21 +198,18 @@ class SerialSetup(tk.Frame):
 
 class FileBrowser(tk.Frame):
     """Generic file browser Frame for selecting a 
-    file and performing a specific action on it.
-    
-    NOTE: User should declare a toggle 
-    function that returns a bool"""
+    file and performing a specific action on it."""
     def __init__(self, master, action_name="[Action]", toggle_func=None):
         super().__init__(master)
+        super().configure(width=600, height=50)
         self.log_label = tk.Label(self, text="File:")
         self.log_label.place(relx=0.3, rely=0, relwidth=0.1, relheight=1)
         
         self.browse_button = tk.Button(self, text="Select File", command=self.select_file)
-        self.browse_button.place(relx=0, rely=0, relwidth=0.15, relheight=1)
+        self.browse_button.place(relx=0.15, rely=0, relwidth=0.15, relheight=1)
         
-        self.action_button = tk.Button(self, command=self.toggle_action)
-        self.bind_action(action_name, toggle_func)
-        self.action_button.place(relx=0.15, rely=0, relwidth=0.15, relheight=1)
+        self.action_button = ControlPair(self, command=toggle_func, text=action_name)
+        self.action_button.place(relx=0, rely=0, relwidth=0.15, relheight=1)
         
         self.label = tk.Label(self, borderwidth=2, relief="groove")
         self.label.place(relx=0.4, rely=0, relwidth=0.6, relheight=1)
@@ -221,27 +218,16 @@ class FileBrowser(tk.Frame):
         path = filedialog.askopenfilename()
         if path:
             self.label.config(text=path)
-    
-    def toggle_action(self):
-        """Execute the toggle_function bound to the button.
-        
-        Expected function signature: func() -> bool"""
-        if not self.toggle_func:
-            print("Action function not bound.")
-            return
-        self.set_button_state(self.toggle_func())
         
     def set_button_state(self, turn_on: bool):
         """Set state of GUI action button"""
-        self.enabled = turn_on
-        self.action_button.config(bg="light green" if turn_on else "red")
-        self.action_button.config(text="{} {}".format(self.action_name, "ON" if turn_on else "OFF"))
+        self.action_button.config(led=turn_on)
         
-    def bind_action(self, action_name, toggle_func):
-        self.action_name = action_name
-        self.toggle_func = toggle_func
-        self.enabled = False
-        self.set_button_state(self.enabled)
+    def set_command(self, func):
+        self.action_button.config(command=func)
+        
+    def set_action_name(self, name):
+        self.action_button.config(text=name)
             
     def get_path(self):
         return self.label.cget("text")
@@ -313,7 +299,7 @@ class VSBGUI(tk.Tk):
         elif name == "connect":
             self.serial_setup.set_connect_func(func)
         elif name == "log cpi":
-            self.filebrowser.bind_action("Log CPI", func)
+            self.filebrowser.set_command("Log CPI", func)
         else:
             self.controls.bind_func(name, func)
 
@@ -479,6 +465,6 @@ if __name__ == "__main__":
     # app.mainloop()
     
     root= tk.Tk()
-    frame = SerialSetup(root)
+    frame = FileBrowser(root)
     frame.pack(fill='both', expand=True)
     root.mainloop()
