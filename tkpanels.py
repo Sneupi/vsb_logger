@@ -10,6 +10,7 @@ from tkinter import filedialog
 import serial.tools.list_ports
 from graph import LiveGraphFrame
 from abc import ABC, abstractmethod
+import re
 
 class ControlPair(tk.Frame):
     """Frame with a button and an indicator"""
@@ -45,6 +46,10 @@ class ControlPair(tk.Frame):
         if text is not None:
             self.button.configure(text=text)
         super().configure(**kwargs)
+        
+    def get_led(self) -> bool:
+        """Get the state of the LED"""
+        return self.led.cget("bg") == "light green"
 
 class StatePair(tk.Frame):
     """Frame with a label and a readout field"""
@@ -345,6 +350,67 @@ class VSBGUI(tk.Tk):
     def spawn_help(self):
         """Spawn a help window"""
         help_window = VSBHelpTopLevel(self)
+
+    def set_command(self, name, func):
+        """Set the command of a control pair button"""
+        ctrl = self.controlpair_dict.get(name, None)
+        if ctrl:
+            ctrl.config(command=func)
+    
+    def set_terminal_send(self, func):
+        """Set the function called on <Return> in the terminal"""
+        self.terminal.set_send_func(func)
+    
+    def set_led(self, name, state):
+        """Set the LED state of a control pair"""
+        ctrl = self.controlpair_dict.get(name, None)
+        if ctrl:
+            ctrl.config(led=state)
+    
+    def set_readout(self, name, text):
+        """Set the text of a state pair readout"""
+        stat = self.statepair_dict.get(name, None)
+        if stat:
+            stat.config(readout_text=text)
+    
+    def append_terminal(self, data: str):
+        """Append a message to the terminal"""
+        self.terminal.insert(data)
+        
+    def append_graph(self, data: str):
+        """Append data to the graph"""
+        # if substring "[int]:   [int]" found
+        if re.search(r"\d+:\s+\d+", data):
+            ch, val = [int(v) for v in re.findall(r"\d+")[-2:]]
+            self.graph.append(ch, val)
+            
+    def get_terminal_entry(self):
+        """Get the terminal entry"""
+        return self.terminal.get_entry()
+    
+    def get_log_path(self):
+        """Get the log file path"""
+        return self.filebrowser.get_path()
+    
+    def get_script_path(self):
+        """Get the script file path"""
+        return self.scriptbrowser.get_path()
+    
+    def get_port(self):
+        """Get the selected port"""
+        return self.serial_setup.get_port()
+    
+    def get_baud(self):
+        """Get the selected baud rate"""
+        return self.serial_setup.get_baud()
+    
+    def get_led(self, name):
+        """Get the LED state of a control pair"""
+        ctrl = self.controlpair_dict.get(name, None)
+        if ctrl:
+            return ctrl.get_led()
+        return None
+
 
 class VSBHelpTopLevel(tk.Toplevel):
     def __init__(self, master):
