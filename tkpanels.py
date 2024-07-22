@@ -49,11 +49,14 @@ class CLIFrame(tk.Frame):
     """Command line interface"""
     def __init__(self, master, send_func=None):
         super().__init__(master)
+        super().configure(width=400, height=400)
+        if not send_func:
+            send_func = lambda _: print("CLIFrame send_func not bound")
         
         self.in_str = tk.StringVar()
         self.in_txt = tk.Entry(self, textvariable=self.in_str)
         self.in_txt.config(border=5, relief="groove")
-        self.in_txt.bind("<Return>", send_func if send_func else lambda _: print("Terminal send function not bound"))
+        self.in_txt.bind("<Return>", send_func)
         self.in_txt.place(relx=0, rely=0.8, relwidth=1, relheight=0.15)
         
         self.out_txt = tk.Text(self, bg="black", fg="white")
