@@ -14,7 +14,7 @@ class ControlPair(tk.Frame):
     """Frame with a button and an indicator"""
     def __init__(self, master, button_text="N/A"):
         super().__init__(master)
-        self.config(width=60, height=20)
+        super().config(width=60, height=20)
         self.led = tk.Label(self, width=2, relief="solid", borderwidth=1)
         self.set_led(False)
         self.button = tk.Button(self, text=button_text)
@@ -31,11 +31,12 @@ class ControlPair(tk.Frame):
 
 class StatePair(tk.Frame):
     """Frame with a label and a readout field"""
-    def __init__(self, master, label_text="N/A"):
+    def __init__(self, master, label_text="???"):
         super().__init__(master)
+        super().config(width=60, height=20)
         
         self.label = tk.Label(self, text=label_text)
-        self.readout = tk.Label(self, text="", relief="solid", borderwidth=1, width=10)  # Set a fixed width for the window
+        self.readout = tk.Label(self, text="", relief="solid", borderwidth=1, width=10)
         
         self.readout.place(relx=0.5, rely=0, relwidth=0.5, relheight=1)  
         self.label.place(relx=0, rely=0, relwidth=0.5, relheight=1)
