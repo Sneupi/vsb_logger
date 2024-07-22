@@ -9,6 +9,7 @@ from tkinter import ttk
 from tkinter import filedialog
 import serial.tools.list_ports
 from graph import LiveGraphFrame
+from abc import ABC, abstractmethod
 
 class ControlPair(tk.Frame):
     """Frame with a button and an indicator"""
@@ -137,12 +138,62 @@ class CLIFrame(tk.Frame):
         self.in_str.set("")
         return data
 
+class WidgetGrid(tk.Frame, ABC):
+    def __init__(self, master, widget_class, list2D):
+        """list2D: list of lists of 
+        strings ordered [column][row]"""
+        super().__init__(master)
+        self.widgets = {}
+        self.widget_class = widget_class
+        for col_ndx, col in enumerate(list2D):
+            for row_ndx, name in enumerate(col):
+                self.widgets[name] = self._instantiation(name)
+                self.widgets[name].grid(row=row_ndx, column=col_ndx, sticky='nsew')
+                self.rowconfigure(row_ndx, weight=1)
+                self.columnconfigure(col_ndx, weight=1)
+                
+    @abstractmethod
+    def _instantiation(self, text) -> tk.Widget:
+        """Instantiate a widget constructing as needed"""
+        pass
+    
+    def get_widgets(self) -> dict:
+        return self.widgets
+    
+class ControlPairGrid(WidgetGrid):
+    def __init__(self, master, list2D):
+        super().__init__(master, ControlPair, list2D)
+    def _instantiation(self, text) -> tk.Widget:
+        return ControlPair(self, text=text)
+    
+class StatePairGrid(WidgetGrid):
+    def __init__(self, master, list2D):
+        super().__init__(master, StatePair, list2D)
+    def _instantiation(self, text) -> tk.Widget:
+        return StatePair(self, label_text=text)
+
 class VSBPanelFrame(tk.Frame):
     """Controls panel for Voltage Sense & Balance (VSB) unit"""
     def __init__(self, master):
         super().__init__(master)
-        # TODO
- 
+        
+        
+        # list[column][row] of each type
+        ctrl_names = [["Run", "Stop", "Balance", "ExtBus", "MQ Dump", "Show DN"], 
+                      ["Debug", "Debug2", "Trace", "Trace2", "Info", "Error"]]
+        stat_names = [["PVM", "CTC", "Last CV", "Last CV DN", "Last Err", "Errs"]]
+        
+        self.ctrl_grid = ControlPairGrid(self, ctrl_names)
+        self.ctrl_grid.pack(side='left', fill='both', expand=True)
+        self.stat_grid = StatePairGrid(self, stat_names)  
+        self.stat_grid.pack(side='left', fill='both', expand=True)
+        
+    def get_controlpair(self, name):
+        return self.ctrl_grid.get_widgets().get(name, None)
+    
+    def get_statepair(self, name):
+        return self.stat_grid.get_widgets().get(name, None)
+        
 class SerialSetup(tk.Frame):
     """User interface for setting up serial connection
     
@@ -470,10 +521,10 @@ GRAPH PANEL:
         
 if __name__ == "__main__":
     # Example demo
-    app = VSBGUI()
-    app.mainloop()
+    # app = VSBGUI()
+    # app.mainloop()
     
-    # root= tk.Tk()
-    # frame = FileBrowser(root)
-    # frame.pack(fill='both', expand=True)
-    # root.mainloop()
+    root= tk.Tk()
+    frame = VSBPanelFrame(root)
+    frame.pack(fill='both', expand=True)
+    root.mainloop()
