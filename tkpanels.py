@@ -203,7 +203,8 @@ class SerialSetup(tk.Frame):
         self.refresh_button = tk.Button(self, text="Refresh Ports", command=self.refresh_ports)
         self.refresh_button.pack(side='right', padx=5, pady=5)
         
-        self.connect_button = ControlPair(self, text="Connect",  command=connect_func)
+        self.connect_name = "Connect"
+        self.connect_button = ControlPair(self, text=self.connect_name,  command=connect_func)
         self.connect_button.pack(side='right', padx=5, pady=5, fill='both', expand=True)
         
     def set_connect_func(self, func):
@@ -235,6 +236,7 @@ class FileBrowser(tk.Frame):
     def __init__(self, master, action_name="[Action]", toggle_func=None):
         super().__init__(master)
         super().configure(width=600, height=50)
+        self.name = action_name
         self.log_label = tk.Label(self, text="File:")
         self.log_label.place(relx=0.3, rely=0, relwidth=0.1, relheight=1)
         
@@ -261,6 +263,7 @@ class FileBrowser(tk.Frame):
         
     def set_action_name(self, name):
         self.action_button.config(text=name)
+        self.name = name
             
     def get_path(self):
         return self.label.cget("text")
@@ -281,11 +284,11 @@ class VSBPanelFrame(tk.Frame):
         self.stat_grid = StatePairGrid(self, stat_names)  
         self.stat_grid.pack(side='left', fill='both', expand=True)
         
-    def get_controlpair(self, name):
-        return self.ctrl_grid.get_widgets().get(name, None)
+    def get_controlpairs(self) -> dict:
+        return self.ctrl_grid.get_widgets()
     
-    def get_statepair(self, name):
-        return self.stat_grid.get_widgets().get(name, None)
+    def get_statepairs(self) -> dict:
+        return self.stat_grid.get_widgets()
 
 class VSBGUI(tk.Tk):
     """GUI frontend for VSB logger & plotter"""
@@ -298,21 +301,19 @@ class VSBGUI(tk.Tk):
         self.resizable(False, False)
 
         self.controls = VSBPanelFrame(self)
-        self.controls.place(relx=0, rely=0, relwidth=0.45, relheight=0.3)
+        self.controls.place(relx=0, rely=0, relwidth=0.45, relheight=0.28)
         
-        self.filebrowser = FileBrowser(self)
-        self.filebrowser.place(relx=0, rely=0.3, relwidth=0.45, relheight=0.05)
-        self.filebrowser.set_action_name("Log CPI")
+        self.filebrowser = FileBrowser(self, action_name="Log CPI")
+        self.filebrowser.place(relx=0, rely=0.34, relwidth=0.45, relheight=0.05)
                 
-        self.scriptbrowser = FileBrowser(self)
-        self.scriptbrowser.place(relx=0, rely=0.25, relwidth=0.45, relheight=0.05)        
-        self.scriptbrowser.set_action_name("Run Script")
+        self.scriptbrowser = FileBrowser(self, action_name="Run Script")
+        self.scriptbrowser.place(relx=0, rely=0.29, relwidth=0.45, relheight=0.05)
 
         self.serial_setup = SerialSetup(self)
         self.serial_setup.place(relx=0, rely=0.95, relwidth=0.45, relheight=0.05)
 
         self.terminal = CLIFrame(self)
-        self.terminal.place(relx=0.01, rely=0.36, relwidth=0.43, relheight=0.58)
+        self.terminal.place(relx=0.01, rely=0.4, relwidth=0.43, relheight=0.54)
         
         self.graph = LiveGraphFrame(self)
         self.graph.place(relx=0.45, rely=0.05, relwidth=0.55, relheight=0.95)
@@ -322,6 +323,15 @@ class VSBGUI(tk.Tk):
         
         self.exit_button = tk.Button(self, text="EXIT")
         self.exit_button.place(relx=0.9, rely=0, relwidth=0.1, relheight=0.05)
+        
+        self.controlpair_dict = dict()
+        self.controlpair_dict.update(self.controls.get_controlpairs())
+        self.controlpair_dict.update({self.filebrowser.name: self.filebrowser.action_button})
+        self.controlpair_dict.update({self.scriptbrowser.name: self.scriptbrowser.action_button})
+        self.controlpair_dict.update({self.serial_setup.connect_name: self.serial_setup.connect_button})
+        
+        self.statepair_dict = dict()
+        self.statepair_dict.update(self.controls.get_statepairs())
 
         self.call_on_exit(None)  # Default behavior
         
@@ -335,97 +345,6 @@ class VSBGUI(tk.Tk):
     def spawn_help(self):
         """Spawn a help window"""
         help_window = VSBHelpTopLevel(self)
-
-    def bind_exit(self, func):
-        """Bind custom function on exit"""
-        self.exit_button.config(command=func)
-        self.protocol("WM_DELETE_WINDOW", func)
-    
-    def bind_terminal_send(self, func):
-        """Bind function to terminal send
-        
-        Expects function with signature: func() -> str"""
-        self.terminal.set_send_func(func)
-    
-    def bind_button(self, name, func):
-        """Bind function to a GUI control panel button.
-        
-        Valid Buttons: balance, connect, debug, debug2, 
-        error, extbus, info, log cpi, mq dump, run, 
-        show dn, stop, trace, trace2, clear err, probe status"""
-        name = name.lower()
-        if name == "clear err":
-            self.controls.stat.set_clear_func(func)
-        elif name == "connect":
-            self.serial_setup.set_connect_func(func)
-        elif name == "log cpi":
-            self.filebrowser.set_command("Log CPI", func)
-        else:
-            self.controls.bind_func(name, func)
-
-    def update_button(self, widget_name, state: bool):
-        """Update button on GUI with new state.
-        
-        Valid Names:
-        - balance
-        - connect
-        - debug
-        - debug2
-        - error
-        - extbus
-        - info
-        - log cpi
-        - mq dump
-        - run
-        - show dn
-        - stop
-        - trace
-        - trace2
-        - probe status"""
-        
-        if widget_name == "log cpi":
-            self.filebrowser.set_button_state(state)
-        elif widget_name == "connect":
-            self.serial_setup.connect_button.configure(state)
-        elif widget_name in ["balance", "extbus", "mq dump", "run", "show dn", "stop", 
-                             "debug", "debug2", "error", "info", "trace", "trace2", "probe status"]:
-            self.controls.set_data(widget_name, state)
-    
-    def update_statistic(self, widget_name, data: str):
-        """Update statistic on GUI with new string.
-        
-        Valid Names:
-        - ctc
-        - dn delta
-        - errs
-        - last cv
-        - last cv dn
-        - last err
-        - pvm"""
-        if widget_name in ["ctc", "dn delta", "errs", "last cv", "last cv dn", "last err", "pvm"]:
-            self.controls.set_data(widget_name, data)
-        
-    def update_terminal(self, data):
-        """Insert data into terminal."""
-        self.terminal.insert(data)
-        
-    def update_graph(self, channel: str, x: int, y: int):
-        """Add new data (x, y) to graph.
-        Plots and shifts graph if necessary."""
-        self.graph.append(channel, y)
-    
-    def get_led(self, widget_name):
-        """Get the state of a specific LED
-        
-        Valid LED names: balance, connect, debug, debug2, 
-        error, extbus, info, log cpi, mq dump, run, 
-        show dn, stop, trace, trace2, probe status"""
-        if widget_name == "connect":
-            return self.serial_setup.connect_button.is_on
-        elif widget_name == "log cpi":
-            return self.filebrowser.enabled
-        else:
-            return self.controls.get_led(widget_name)
 
 class VSBHelpTopLevel(tk.Toplevel):
     def __init__(self, master):
@@ -521,10 +440,10 @@ GRAPH PANEL:
         
 if __name__ == "__main__":
     # Example demo
-    # app = VSBGUI()
-    # app.mainloop()
+    app = VSBGUI()
+    app.mainloop()
     
-    root= tk.Tk()
-    frame = VSBPanelFrame(root)
-    frame.pack(fill='both', expand=True)
-    root.mainloop()
+    # root= tk.Tk()
+    # frame = VSBPanelFrame(root)
+    # frame.pack(fill='both', expand=True)
+    # root.mainloop()
