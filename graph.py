@@ -14,8 +14,6 @@ import datetime
 class Line:
     """Line object to abstract matplotlib Line2D management"""
     def __init__(self, name, ax: plt.Axes):
-        self.ax = ax
-        self.name = name
         self.x = []
         self.y = []
         self.line = ax.plot([], [], label=name)[0]
