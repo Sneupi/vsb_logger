@@ -102,92 +102,10 @@ class CLIFrame(tk.Frame):
         self.in_str.set("")
         return data
 
-class ControlsFrame(tk.Frame):
-    """Controls panel, with system, diagnostic, and status columns"""
+class VSBPanelFrame(tk.Frame):
+    """Controls panel for Voltage Sense & Balance (VSB) unit"""
     def __init__(self, master):
         super().__init__(master)
-        
-    def set_data(self, widget_name, data):
-        """Update GUI widget with new data.
-        
-        Valid Datatype (per widget):
-        - State: str
-        - Button: bool
-        
-        Valid Buttons:
-        - balance
-        - probe status
-        - debug
-        - debug2
-        - error
-        - extbus
-        - info
-        - log cpi
-        - mq dump
-        - run
-        - show dn
-        - stop
-        - trace
-        - trace2
-        
-        Valid States:
-        - ctc
-        - dn delta
-        - errs
-        - last cv
-        - last cv dn
-        - last err
-        - pvm"""
-        widget_name = widget_name.lower()
-        if widget_name in ["balance", "probe status", "extbus", "mq dump", "run", "show dn", "stop"]:
-            if isinstance(data, bool):
-                self.sys.set_led(widget_name, data)
-            else:
-                raise TypeError("Invalid data type for button widget. Expected bool.")
-            
-        elif widget_name in ["debug", "debug2", "error", "info", "log cpi", "trace", "trace2"]:
-            if isinstance(data, bool):
-                self.diag.set_led(widget_name, data)
-            else:
-                raise TypeError("Invalid data type for button widget. Expected bool.")
-            
-        elif widget_name in ["ctc", "dn delta", "errs", "last cv", "last cv dn", "last err", "pvm"]:
-            if isinstance(data, str):
-                self.stat.set_state(widget_name, data)
-            else:
-                raise TypeError("Invalid data type for state widget. Expected str.")
-            
-        else:
-            raise ValueError("Invalid widget name.")
-    
-    def bind_func(self, widget_name, func):
-        """Bind function to GUI button
-        
-        Valid Buttons: 
-        balance, probe status, debug, debug2, error, extbus, info, 
-        log cpi, mq dump, run, show dn, stop, trace, trace2"""
-        widget_name = widget_name.lower()
-        if widget_name in ["balance", "probe status", "extbus", "mq dump", "run", "show dn", "stop"]:
-            self.sys.set_button_command(widget_name, func)
-        elif widget_name in ["debug", "debug2", "error", "info", "log cpi", "trace", "trace2"]:
-            self.diag.set_button_command(widget_name, func)
-        else:
-            raise ValueError("Invalid widget name.")
-        
-    def get_led(self, widget_name):
-        """Get the state of a specific LED
-        
-        Valid LED names: balance, probe status, debug, debug2, 
-        error, extbus, info, log cpi, mq dump, run, 
-        show dn, stop, trace, trace2"""
-        #FIXME log cpi are not setup, will return None
-        widget_name = widget_name.lower()
-        if widget_name in ["balance", "probe status", "extbus", "mq dump", "run", "show dn", "stop"]:
-            return self.sys.get_led(widget_name)
-        elif widget_name in ["debug", "debug2", "error", "info", "log cpi", "trace", "trace2"]:
-            return self.diag.get_led(widget_name)
-        else:
-            raise ValueError("Invalid widget name.")
  
 class SerialSetup(tk.Frame):
     """User interface for setting up serial connection
@@ -321,7 +239,7 @@ class VSBGUI(tk.Tk):
         self.geometry("1400x700")
         self.resizable(False, False)
 
-        self.controls = ControlsFrame(self)
+        self.controls = VSBPanelFrame(self)
         self.controls.place(relx=0, rely=0, relwidth=0.45, relheight=0.3)
         
         self.filebrowser = FileBrowser(self)
