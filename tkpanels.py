@@ -12,38 +12,69 @@ from graph import LiveGraphFrame
 
 class ControlPair(tk.Frame):
     """Frame with a button and an indicator"""
-    def __init__(self, master, button_text="N/A"):
-        super().__init__(master)
+    def __init__(self, 
+                 master, 
+                 command:callable=None, 
+                 led=False, 
+                 text:str="", 
+                 **kwargs):
+        super().__init__(master, **kwargs)
         super().configure(width=60, height=20)
+        if not command:
+            command = lambda: print(f"{text}: Button not bound")
         self.led = tk.Label(self, width=2, relief="solid", borderwidth=1)
-        self.set_led(False)
-        self.button = tk.Button(self, text=button_text)
+        self.button = tk.Button(self, text=text)
+        self.configure(command=command, text=text, led=led)
         self.led.place(relx=0, rely=0, relwidth=0.2, relheight=1)
         self.button.place(relx=0.2, rely=0, relwidth=0.8, relheight=1)
     
-    def set_led(self, on: bool):
-        """Set LED to ON or OFF"""
-        self.led.configure(bg="light green" if on else "red")
-
-    def set_command(self, command):
-        """Set function called on button press"""
-        self.button.configure(command=command)
+    def configure(self, 
+                  command: callable=None, 
+                  led: bool=None, 
+                  text: str=None, 
+                  **kwargs):
+        """Override method for tk.Frame. Allows config of led, text and 
+        command appropriately, passing all other kwargs to tk.Frame.configure"""
+        if command is not None:
+            self.button.configure(command=command)
+        if led is not None:
+            self.led.configure(bg="light green" if led else "red")
+        if text is not None:
+            self.button.configure(text=text)
+        super().configure(**kwargs)
 
 class StatePair(tk.Frame):
     """Frame with a label and a readout field"""
-    def __init__(self, master, label_text="???"):
-        super().__init__(master)
+    def __init__(self, 
+                 master, 
+                 label_text:str="???", 
+                 readout_text:str="", 
+                 **kwargs):
+        super().__init__(master, **kwargs)
         super().configure(width=60, height=20)
         
         self.label = tk.Label(self, text=label_text)
-        self.readout = tk.Label(self, text="", relief="solid", borderwidth=1, width=10)
+        self.readout = tk.Label(self, 
+                                text=readout_text, 
+                                relief="solid", 
+                                borderwidth=1, 
+                                width=10)
         
         self.readout.place(relx=0.5, rely=0, relwidth=0.5, relheight=1)  
         self.label.place(relx=0, rely=0, relwidth=0.5, relheight=1)
 
-    def set_readout(self, new_text):
-        """Update the readout text"""
-        self.readout.configure(text=new_text)
+    def configure(self, 
+                 label_text:str=None, 
+                 readout_text:str=None, 
+                 **kwargs):
+        """Override method for tk.Frame. Allows config of 
+        label_text and readout_text appropriately, passing 
+        all other kwargs to tk.Frame.configure"""
+        if label_text is not None:
+            self.label.configure(text=label_text)
+        if readout_text is not None:
+            self.readout.configure(text=readout_text)
+        super().configure(**kwargs)
             
 class CLIFrame(tk.Frame):
     """Command line interface"""
@@ -141,12 +172,12 @@ class SerialSetup(tk.Frame):
         self.refresh_button = tk.Button(self, text="Refresh Ports", command=self.refresh_ports)
         self.refresh_button.pack(side='right', padx=5, pady=5)
         
-        self.connect_button = ControlPair(self, button_text="Connect")
-        self.connect_button.set_command(connect_func)
+        self.connect_button = ControlPair(self, text="Connect")
+        self.connect_button.configure(command=connect_func)
         self.connect_button.pack(side='right', padx=5, pady=5, fill='both', expand=True)
         
     def set_connect_func(self, func):
-        self.connect_button.set_command(command=func)
+        self.connect_button.configure(command=func)
     
     def get_available_ports(self):
         """Get system available serial port names as list"""
@@ -312,7 +343,7 @@ class VSBGUI(tk.Tk):
         if widget_name == "log cpi":
             self.filebrowser.set_button_state(state)
         elif widget_name == "connect":
-            self.serial_setup.connect_button.set_led(state)
+            self.serial_setup.connect_button.configure(state)
         elif widget_name in ["balance", "extbus", "mq dump", "run", "show dn", "stop", 
                              "debug", "debug2", "error", "info", "trace", "trace2", "probe status"]:
             self.controls.set_data(widget_name, state)
