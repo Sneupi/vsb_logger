@@ -8,7 +8,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 import serial.tools.list_ports
-from graph import LiveGraphFrame
+from tkgraph import LiveGraph
 from abc import ABC, abstractmethod
 import re
 
@@ -320,7 +320,7 @@ class VSBGUI(tk.Tk):
         self.terminal = CLIFrame(self)
         self.terminal.place(relx=0.01, rely=0.4, relwidth=0.43, relheight=0.54)
         
-        self.graph = LiveGraphFrame(self)
+        self.graph = LiveGraph(self)
         self.graph.place(relx=0.45, rely=0.05, relwidth=0.55, relheight=0.95)
         
         self.help_button = tk.Button(self, text="HELP", command=self.spawn_help)
