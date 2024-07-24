@@ -301,6 +301,8 @@ class VSBGUI(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         
+        self.cv_mode = True
+        
         self.title("VSB Logger")
         self.geometry("1400x700")
         self.resizable(False, False)
@@ -377,12 +379,9 @@ class VSBGUI(tk.Tk):
         """Append a message to the terminal"""
         self.terminal.insert(data)
         
-    def append_graph(self, data: str):
+    def append_graph(self, ch, val):
         """Append data to the graph"""
-        # if substring "[int]:   [int]" found
-        if re.search(r"\d+:\s+\d+", data):
-            ch, val = [int(v) for v in re.findall(r"\d+")[-2:]]
-            self.graph.append(ch, val)
+        self.graph.append(ch, val)
             
     def get_terminal_entry(self):
         """Get the terminal entry"""
@@ -411,6 +410,15 @@ class VSBGUI(tk.Tk):
             return ctrl.get_led()
         return None
 
+    def update_gui(self, data: str, is_rx: bool):
+        """Update the GUI with incoming data"""
+        self.append_terminal(data)
+        if is_rx:
+            # TODO update buttons, readouts, etc.
+            if re.search(r"\d+:\s+\d+", data):
+                if (self.cv_mode and "DBG CV" in data) or not self.cv_mode:    
+                    ch, val = [int(v) for v in re.findall(r"\d+")[-2:]]
+                    self.append_graph(ch, val)
 
 class VSBHelpTopLevel(tk.Toplevel):
     def __init__(self, master):
