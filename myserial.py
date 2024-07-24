@@ -93,12 +93,10 @@ if __name__ == "__main__":
     class SerialGUI(tk.Tk):
         """Example GUI to demonstrate 
         SerialThread and SerialLogger"""
-        def __init__(self, port, baudrate, filepath):
+        def __init__(self, port, baudrate):
             super().__init__()
             self.geometry("400x300")
             self.protocol("WM_DELETE_WINDOW", self.__del__)
-
-            self.serial_logger = SerialLogger(filepath, 'w')
             self.serial_thread = SerialThread(port, baudrate)
             self.serial_thread.start()
 
@@ -118,12 +116,9 @@ if __name__ == "__main__":
             self.input_field.delete(0, tk.END)
 
         def update_transaction_history(self):
-            """WARNING: 
-            Infinitely recursive function! 
-            Used as an easy scheduling hack."""
+            """WARNING: Infinitely recursive (...easy hack)"""
             while not self.serial_thread.txn_queue.empty():
                 direction, data = self.serial_thread.txn_queue.get()
-                self.serial_logger.log_tx(data) if direction == 'TX' else self.serial_logger.log_rx(data)
                 self.terminal.insert(tk.END, f"{direction}: {data}")
                 self.terminal.see(tk.END)  # Scroll to bottom
 
@@ -131,12 +126,10 @@ if __name__ == "__main__":
 
         def __del__(self):
             self.serial_thread.stop()
-            self.serial_logger.close()
             self.destroy()
     
-    port = "COM9"  # Replace with your serial port
+    port = "COM3"  # Replace with your serial port
     baudrate = 115200  # Replace with your desired baudrate
-    filepath = "transaction_history.csv"  # Replace with your desired file path
 
-    gui = SerialGUI(port, baudrate, filepath)
+    gui = SerialGUI(port, baudrate)
     gui.mainloop()
