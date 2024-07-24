@@ -44,6 +44,7 @@ class LinesHandler:
     def clear_all(self):
         """Delete lines, clearing them from graph"""
         self.lines.clear()
+        self.legendhandler.clear()
 
 class LegendHandler:
     """Handles legend updates and toggle line visibility."""
@@ -76,6 +77,10 @@ class LegendHandler:
         for lgl, axl in zip(self.ax.get_legend().get_lines(), lines):
             lgl.set_picker(5)
             self.lines[lgl] = axl
+    
+    def clear(self):
+        """remove legend from graph"""
+        self.ax.get_legend().remove()
 
 class LimitHandler:
     """Tracks graph bounds and handles 
@@ -192,6 +197,7 @@ class LiveGraph:
     def set_width(self, width):
         """Set the width of the graph in x-axis units."""
         self.limits.set_width(width)
+        self.fig.canvas.draw_idle()
     
     def set_auto(self, is_auto):
         """Set the graph to autoshift mode, else
@@ -201,11 +207,13 @@ class LiveGraph:
     def set_xlim_to_relx(self, percent: float):
         """View graph at relative x between 0.0 (xmin) and 1.0 (xmax)."""
         self.limits.set_xlim_to_relx(percent)
+        self.fig.canvas.draw_idle()
         
     def clear(self):
         """Clear all lines from graph"""
         self.lines.clear_all()
         self.limits.clear_tracked()
+        self.fig.canvas.draw_idle()
     
     def _run(self, _):
         # Update bounds

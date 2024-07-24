@@ -13,7 +13,7 @@ class LiveGraph(tk.Frame):
         x = datetime.datetime.now()
         self.graph.append(line_name, x, y)
         
-    def __init__(self, master, interval=100):
+    def __init__(self, master, interval):
         super().__init__(master)
         
         def toggle_auto():
@@ -97,7 +97,7 @@ def __demo_tkinter():
                 time.sleep(0.07)
     
     root = tk.Tk()
-    gph = LiveGraph(root)
+    gph = LiveGraph(root, interval=1000)
     gph.pack(fill=tk.BOTH, expand=True)
                 
     thread = threading.Thread(target=thread_func, args=(gph,))
