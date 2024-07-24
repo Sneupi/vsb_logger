@@ -7,7 +7,7 @@ Purpose: File joining components for VSB logger
 import threading
 import serial
 import time
-from views.tkpanels import VSBGUI
+from view.tkpanels import MainView
 from myserial import SerialLogger
 import re
 
@@ -40,7 +40,7 @@ class VSBApp(threading.Thread):
     NOTE: Thread is infinite but stoppable with stop() method.
     """
     
-    def __init__(self, gui: VSBGUI):
+    def __init__(self, gui: MainView):
         super().__init__()
         
         self.running = False
@@ -275,7 +275,7 @@ class VSBApp(threading.Thread):
         self.stop()
 
 if __name__ == '__main__':
-    gui = VSBGUI()
+    gui = MainView()
     app = VSBApp(gui)
     app.start()
     gui.mainloop()

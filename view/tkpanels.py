@@ -296,32 +296,25 @@ class VSBPanelFrame(tk.Frame):
     def get_statepairs(self) -> dict:
         return self.stat_grid.get_widgets()
 
-class VSBGUI(tk.Tk):
+class MainView(tk.Frame):
     """GUI frontend for VSB logger & plotter"""
     
-    def __init__(self, interval, *args, **kwargs):
-        tk.Tk.__init__(self, *args, **kwargs)
+    def __init__(self, master, interval, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
         
         self.cv_mode = True
-        
-        self.title("VSB Logger")
-        self.geometry("1400x700")
-        self.resizable(False, False)
 
         self.controls = VSBPanelFrame(self)
         self.controls.place(relx=0, rely=0, relwidth=0.45, relheight=0.28)
         
         self.filebrowser = FileBrowser(self, action_name="Log CPI")
-        self.filebrowser.place(relx=0, rely=0.34, relwidth=0.45, relheight=0.05)
-                
-        self.scriptbrowser = FileBrowser(self, action_name="Run Script")
-        self.scriptbrowser.place(relx=0, rely=0.29, relwidth=0.45, relheight=0.05)
+        self.filebrowser.place(relx=0, rely=0.29, relwidth=0.45, relheight=0.06)
 
         self.serial_setup = SerialSetup(self)
         self.serial_setup.place(relx=0, rely=0.95, relwidth=0.45, relheight=0.05)
 
         self.terminal = CLIFrame(self)
-        self.terminal.place(relx=0.01, rely=0.4, relwidth=0.43, relheight=0.54)
+        self.terminal.place(relx=0.01, rely=0.36, relwidth=0.43, relheight=0.58)
         
         self.graph = LiveGraphTk(self, interval)
         self.graph.place(relx=0.45, rely=0.05, relwidth=0.55, relheight=0.95)
@@ -335,20 +328,13 @@ class VSBGUI(tk.Tk):
         self.controlpair_dict = dict()
         self.controlpair_dict.update(self.controls.get_controlpairs())
         self.controlpair_dict.update({self.filebrowser.name: self.filebrowser.action_button})
-        self.controlpair_dict.update({self.scriptbrowser.name: self.scriptbrowser.action_button})
         self.controlpair_dict.update({self.serial_setup.connect_name: self.serial_setup.connect_button})
         
         self.statepair_dict = dict()
         self.statepair_dict.update(self.controls.get_statepairs())
-
-        self.call_on_exit(None)  # Default behavior
         
-    def call_on_exit(self, func=None):
-        """If func not None, calls function 
-        following default exit behavior."""
-        cmd = lambda: self.quit() or self.destroy() or (func() if func else None)
-        self.exit_button.config(command=cmd) 
-        self.protocol("WM_DELETE_WINDOW", cmd)
+    def __del__(self):
+        self.graph.quit() or self.graph.destroy()
     
     def spawn_help(self):
         """Spawn a help window"""
@@ -391,10 +377,6 @@ class VSBGUI(tk.Tk):
     def get_log_path(self):
         """Get the log file path"""
         return self.filebrowser.get_path()
-    
-    def get_script_path(self):
-        """Get the script file path"""
-        return self.scriptbrowser.get_path()
     
     def get_port(self):
         """Get the selected port"""
@@ -515,10 +497,13 @@ GRAPH PANEL:
         
 if __name__ == "__main__":
     # Example demo
-    app = VSBGUI(100)
-    app.mainloop()
+    root = tk.Tk()
+    root.title("VSB Logger")
+    root.geometry("1400x700")
+    root.resizable(False, False)
+    root.protocol("WM_DELETE_WINDOW", lambda: root.quit() or root.destroy())
     
-    # root= tk.Tk()
-    # frame = VSBPanelFrame(root)
-    # frame.pack(fill='both', expand=True)
-    # root.mainloop()
+    view = MainView(root, 100)
+    view.pack(fill='both', expand=True)
+    root.mainloop()
+    

@@ -54,6 +54,6 @@ def demo_livegraph_tk(interval):
     thread.daemon = True
     thread.start()
     
-    # FIXME matplot lib not exiting properly, so this is a workaround
-    root.protocol("WM_DELETE_WINDOW", lambda: root.quit() or root.destroy())  
+    # FIXME tkinter not exiting mainloop after close unless
+    # root.protocol("WM_DELETE_WINDOW", lambda: root.quit() or root.destroy())  
     root.mainloop()
