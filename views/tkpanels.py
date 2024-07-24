@@ -8,9 +8,10 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 import serial.tools.list_ports
-from tkgraph import LiveGraph
+from graphing import LiveGraphTk
 from abc import ABC, abstractmethod
 import re
+
 
 class ControlPair(tk.Frame):
     """Frame with a button and an indicator"""
@@ -298,7 +299,7 @@ class VSBPanelFrame(tk.Frame):
 class VSBGUI(tk.Tk):
     """GUI frontend for VSB logger & plotter"""
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, interval, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         
         self.cv_mode = True
@@ -322,7 +323,7 @@ class VSBGUI(tk.Tk):
         self.terminal = CLIFrame(self)
         self.terminal.place(relx=0.01, rely=0.4, relwidth=0.43, relheight=0.54)
         
-        self.graph = LiveGraph(self)
+        self.graph = LiveGraphTk(self, interval)
         self.graph.place(relx=0.45, rely=0.05, relwidth=0.55, relheight=0.95)
         
         self.help_button = tk.Button(self, text="HELP", command=self.spawn_help)
@@ -514,7 +515,7 @@ GRAPH PANEL:
         
 if __name__ == "__main__":
     # Example demo
-    app = VSBGUI()
+    app = VSBGUI(100)
     app.mainloop()
     
     # root= tk.Tk()

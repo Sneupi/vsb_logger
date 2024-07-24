@@ -1,10 +1,69 @@
+"""Package containing classes for live 
+matplotlib graphs with interactive interface."""
 
-import tkinter as tk
+from .helpers import LinesHandler, LimitHandler
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+
+class LiveGraph:
+    """Live matplotlib graph with interactive interface."""
+    def __init__(self, width, interval=500, enable_pick_event=True):
+        """NOTE: units/type of x must be consistent for all provided values.
+        
+        Args:
+            width (Any): Width of the graph in x-axis units
+            interval (int): Refresh interval millis.
+        """
+        self.fig, self.ax = plt.subplots()
+        self.ax.grid()
+        self.ax.tick_params(axis='x', rotation=45)
+        self.fig.subplots_adjust(bottom=0.2)
+        
+        self.lines = LinesHandler(self.ax, self.fig, enable_pick_event)
+        self.ani = FuncAnimation(self.fig, self._run, blit=False, 
+                                 interval=interval, repeat=False)
+        self.limits = LimitHandler(self.ax, width)
+        self.is_auto = True
+        
+    def append(self, line_name, x, y):
+        """Append data to the graph at line"""
+        self.limits.track_data(x, y)
+        self.lines.append(line_name, x, y)
+        
+    def set_width(self, width):
+        """Set the width of the graph in x-axis units."""
+        self.limits.set_width(width)
+        self.fig.canvas.draw_idle()
+    
+    def set_auto(self, is_auto):
+        """Set the graph to autoshift mode, else
+        x-axis remains still until manually updated"""
+        self.is_auto = is_auto
+    
+    def set_xlim_to_relx(self, percent: float):
+        """View graph at relative x between 0.0 (xmin) and 1.0 (xmax)."""
+        self.limits.set_xlim_to_relx(percent)
+        self.fig.canvas.draw_idle()
+        
+    def clear(self):
+        """Clear all lines from graph"""
+        self.lines.clear_all()
+        self.limits.clear_tracked()
+        self.fig.canvas.draw_idle()
+    
+    def _run(self, _):
+        # Update bounds
+        if self.is_auto:
+            self.limits.set_xlim_to_newest()
+        self.limits.set_ylim()
+        # Update lines
+        return self.lines.get_lines()
+
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+import tkinter as tk
 import datetime
-import graph
 
-class LiveGraph(tk.Frame):
+class LiveGraphTk(tk.Frame):
     """Generic tkinter.Frame LiveGraph using graph.LiveGraph.
     
     NOTE: This example enforces datetime units of width."""
@@ -22,6 +81,8 @@ class LiveGraph(tk.Frame):
             self.auto_button.config(text=txt)
         
         def manual_scroll(event):
+            if self.graph.is_auto:
+                return
             self.graph.set_xlim_to_relx(self.scroll_slider.get()/100)
             
         def update_width(event=None):
@@ -35,7 +96,7 @@ class LiveGraph(tk.Frame):
             width = self.width_slider.get() * time_units[unit]
             self.graph.set_width(datetime.timedelta(seconds=width))
             
-        self.graph = graph.LiveGraph(width=datetime.timedelta(seconds=10), interval=interval)
+        self.graph = LiveGraph(width=datetime.timedelta(seconds=10), interval=interval)
         self.canvas = FigureCanvasTkAgg(self.graph.fig, master=self)
         self.canvas.get_tk_widget().grid(row=0, column=0, columnspan=10, sticky=tk.NSEW)
             
@@ -83,30 +144,3 @@ class LiveGraph(tk.Frame):
         self.grid_columnconfigure(8, weight=1)
         self.grid_columnconfigure(9, weight=1)
         
-def __demo_tkinter():
-    import threading
-    import time
-    import random
-    
-    def thread_func(graph: LiveGraph):
-        """Simulate graphing data coming in from a source"""
-        while True:
-            for i in range(12):
-                v = random.randint(341*i, 341*(i+1))
-                graph.append(f"{i}", v)
-                time.sleep(0.07)
-    
-    root = tk.Tk()
-    gph = LiveGraph(root, interval=1000)
-    gph.pack(fill=tk.BOTH, expand=True)
-                
-    thread = threading.Thread(target=thread_func, args=(gph,))
-    thread.daemon = True
-    thread.start()
-    
-    # FIXME matplot lib not exiting properly, so this is a workaround
-    root.protocol("WM_DELETE_WINDOW", lambda: root.quit() or root.destroy())  
-    root.mainloop()
-
-if __name__ == "__main__":
-    __demo_tkinter()

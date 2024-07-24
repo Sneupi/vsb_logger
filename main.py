@@ -7,7 +7,7 @@ Purpose: File joining components for VSB logger
 import threading
 import serial
 import time
-from tkpanels import VSBGUI
+from views.tkpanels import VSBGUI
 from myserial import SerialLogger
 import re
 
