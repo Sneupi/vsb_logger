@@ -9,6 +9,24 @@ import threading
 import serial
 import time
 import queue
+'''
+SerialModel which implements ObservableModel
+attr:
+    - ser
+    - port
+    - baudrate
+    - last rx
+    - last tx
+methods:
+    - connect
+    - disconnect
+    - send
+    - receive
+this guy handles event updates on successful action, to all listeners
+a threaded class SerialLoop handles the serial read action on a live serial port
+'''
+# FIXME rework as detailed ^^^
+
 
 class SerialThread(threading.Thread):
     """Thread that allows asynchronous serial 
