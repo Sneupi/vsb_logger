@@ -8,7 +8,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 import serial.tools.list_ports
-from graphing import LiveGraphTk
+from .graphing import LiveGraphTk
 from abc import ABC, abstractmethod
 import re
 
@@ -296,113 +296,6 @@ class VSBPanelFrame(tk.Frame):
     def get_statepairs(self) -> dict:
         return self.stat_grid.get_widgets()
 
-class MainView(tk.Frame):
-    """GUI frontend for VSB logger & plotter"""
-    
-    def __init__(self, master, interval, *args, **kwargs):
-        super().__init__(master, *args, **kwargs)
-        
-        self.cv_mode = True
-
-        self.controls = VSBPanelFrame(self)
-        self.controls.place(relx=0, rely=0, relwidth=0.45, relheight=0.28)
-        
-        self.filebrowser = FileBrowser(self, action_name="Log CPI")
-        self.filebrowser.place(relx=0, rely=0.29, relwidth=0.45, relheight=0.06)
-
-        self.serial_setup = SerialSetup(self)
-        self.serial_setup.place(relx=0, rely=0.95, relwidth=0.45, relheight=0.05)
-
-        self.terminal = CLIFrame(self)
-        self.terminal.place(relx=0.01, rely=0.36, relwidth=0.43, relheight=0.58)
-        
-        self.graph = LiveGraphTk(self, interval)
-        self.graph.place(relx=0.45, rely=0.05, relwidth=0.55, relheight=0.95)
-        
-        self.help_button = tk.Button(self, text="HELP", command=self.spawn_help)
-        self.help_button.place(relx=0.8, rely=0, relwidth=0.1, relheight=0.05)
-        
-        self.exit_button = tk.Button(self, text="EXIT")
-        self.exit_button.place(relx=0.9, rely=0, relwidth=0.1, relheight=0.05)
-        
-        self.controlpair_dict = dict()
-        self.controlpair_dict.update(self.controls.get_controlpairs())
-        self.controlpair_dict.update({self.filebrowser.name: self.filebrowser.action_button})
-        self.controlpair_dict.update({self.serial_setup.connect_name: self.serial_setup.connect_button})
-        
-        self.statepair_dict = dict()
-        self.statepair_dict.update(self.controls.get_statepairs())
-        
-    def __del__(self):
-        self.graph.quit() or self.graph.destroy()
-    
-    def spawn_help(self):
-        """Spawn a help window"""
-        help_window = VSBHelpTopLevel(self)
-
-    def set_command(self, name, func):
-        """Set the command of a control pair button"""
-        ctrl = self.controlpair_dict.get(name, None)
-        if ctrl:
-            ctrl.config(command=func)
-    
-    def set_terminal_send(self, func):
-        """Set the function called on <Return> in the terminal"""
-        self.terminal.set_send_func(func)
-    
-    def set_led(self, name, state):
-        """Set the LED state of a control pair"""
-        ctrl = self.controlpair_dict.get(name, None)
-        if ctrl:
-            ctrl.config(led=state)
-    
-    def set_readout(self, name, text):
-        """Set the text of a state pair readout"""
-        stat = self.statepair_dict.get(name, None)
-        if stat:
-            stat.config(readout_text=text)
-    
-    def append_terminal(self, data: str):
-        """Append a message to the terminal"""
-        self.terminal.insert(data)
-        
-    def append_graph(self, ch, val):
-        """Append data to the graph"""
-        self.graph.append(ch, val)
-            
-    def get_terminal_entry(self):
-        """Get the terminal entry"""
-        return self.terminal.get_entry()
-    
-    def get_log_path(self):
-        """Get the log file path"""
-        return self.filebrowser.get_path()
-    
-    def get_port(self):
-        """Get the selected port"""
-        return self.serial_setup.get_port()
-    
-    def get_baud(self):
-        """Get the selected baud rate"""
-        return self.serial_setup.get_baud()
-    
-    def get_led(self, name):
-        """Get the LED state of a control pair"""
-        ctrl = self.controlpair_dict.get(name, None)
-        if ctrl:
-            return ctrl.get_led()
-        return None
-
-    def update_gui(self, data: str, is_rx: bool):
-        """Update the GUI with incoming data"""
-        self.append_terminal(data)
-        if is_rx:
-            # TODO update buttons, readouts, etc.
-            if re.search(r"\d+:\s+\d+", data):
-                if (self.cv_mode and "DBG CV" in data) or not self.cv_mode:    
-                    ch, val = [int(v) for v in re.findall(r"\d+")[-2:]]
-                    self.append_graph(ch, val)
-
 class VSBHelpTopLevel(tk.Toplevel):
     def __init__(self, master):
         super().__init__(master)
@@ -495,15 +388,3 @@ GRAPH PANEL:
         self.text.insert("1.0", help_content)
         self.text.configure(state="disabled")
         
-if __name__ == "__main__":
-    # Example demo
-    root = tk.Tk()
-    root.title("VSB Logger")
-    root.geometry("1400x700")
-    root.resizable(False, False)
-    root.protocol("WM_DELETE_WINDOW", lambda: root.quit() or root.destroy())
-    
-    view = MainView(root, 100)
-    view.pack(fill='both', expand=True)
-    root.mainloop()
-    
