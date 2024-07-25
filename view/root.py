@@ -7,4 +7,7 @@ class Root(tk.Tk):
         self.title("VSB Logger")
         self.geometry("1400x700")
         self.resizable(False, False)
-        self.protocol("WM_DELETE_WINDOW", lambda: self.quit() or self.destroy())
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
+        
+    def on_close(self):
+        self.quit()

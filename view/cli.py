@@ -22,7 +22,7 @@ class CLIFrame(tk.Frame):
         self.clr_button.place(relx=0.66, rely=0.95, relwidth=0.33, relheight=0.05)
         
         self.is_scroll = True
-        self.scroll_button = tk.Button(self, text="Scroll OFF", command=self.pause_scroll)
+        self.scroll_button = tk.Button(self, text="Scroll ON", command=self.pause_scroll)
         self.scroll_button.place(relx=0.33, rely=0.95, relwidth=0.33, relheight=0.05)
 
     def set_send_func(self, send_func):
@@ -46,7 +46,7 @@ class CLIFrame(tk.Frame):
     def pause_scroll(self):
         """Toggle the scroll state"""
         self.is_scroll = not self.is_scroll
-        self.scroll_button.config(text="Scroll {}".format("OFF" if self.is_scroll else "ON"))
+        self.scroll_button.config(text="Scroll {}".format("ON" if self.is_scroll else "OFF"))
         if self.is_scroll:
             self.out_txt.see(tk.END)
         

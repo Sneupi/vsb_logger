@@ -1,8 +1,7 @@
 import tkinter as tk
-from abc import ABC, abstractmethod
 
-
-class VSBHelpTopLevel(tk.Toplevel):
+class HelpView(tk.Toplevel):
+    """Help popout for VSB Logger (tk.Toplevel)"""
     def __init__(self, master):
         super().__init__(master)
         

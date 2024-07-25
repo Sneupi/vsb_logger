@@ -65,3 +65,11 @@ def demo_serial_connector():
     serial_connector.set_connect_func(lambda: 
         print(f"{serial_connector.get_port()} and {serial_connector.get_baud()}"))
     root.mainloop()
+
+def demo_all():
+    demo_status_frame_grid()
+    demo_led_button_grid()
+    demo_status_frame()
+    demo_led_button()
+    demo_file_action()
+    demo_serial_connector()

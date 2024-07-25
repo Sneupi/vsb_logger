@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from .helpers import SerialConnectorFrame
+from .widgets.serial_connector import SerialConnectorFrame
 import serial.tools.list_ports
 
 class SerialView(SerialConnectorFrame):

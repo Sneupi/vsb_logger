@@ -1,5 +1,5 @@
 import tkinter as tk
+from view import View
 
-from view.widgets.demos import *
-
-demo_all()
+v = View()
+v.start()

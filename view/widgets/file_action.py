@@ -29,6 +29,10 @@ class FileAction(tk.Frame):
         """Set state of GUI action button"""
         self.action_button.set_led(turn_on)
         
+    def get_button_state(self) -> bool:
+        """Get state of GUI action button"""
+        return self.action_button.get_led()
+        
     def set_command(self, func):
         """Set command function for action button"""
         self.action_button.set_command(func)

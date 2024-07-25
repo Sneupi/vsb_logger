@@ -2,7 +2,7 @@ import tkinter as tk
 from model import SerialModel
 from view import View
     
-class VSBController:
+class Controller:
     """Controller for connection between 
     Model and View of VSB app"""
     pass
