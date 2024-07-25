@@ -13,7 +13,7 @@ import tkinter as tk
 # v = View()
 # v.start()
 
-from controller.controller import TestController, TestView
-tv = TestView()
-tc = TestController(tv)
+from controller.controller import Controller, View
+tv = View()
+tc = Controller(tv)
 tc.start()

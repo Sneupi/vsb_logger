@@ -1,9 +1,9 @@
 from model import SerialModel
-from .view import TestView
+from view.view import View
 
 class PanelController:
     """Specifically for VSB button panel"""
-    def __init__(self, view: TestView):
+    def __init__(self, view: View):
         self.view = view.controls
         
     def bind_buttons(self, model: SerialModel):

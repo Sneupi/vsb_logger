@@ -1,46 +1,63 @@
-"""Package for the GUI frontend of the VSB logger & plotter."""
 
-import tkinter as tk
-from .root import Root
-
-from .help import HelpWindow
-from .controls import VSBControls
-from .widgets.file_action import FileAction
-
-from .widgets.cli import CLI
-from .widgets.serial_connector import SerialConnector
-from .widgets.live_graph_tk import LiveGraphTk
+from view.root import Root
+from view.widgets.serial_connector import SerialConnector
+from view.widgets.cli import CLI
+from view.controls import VSBControls
 
 class View:
-    """GUI frontend for VSB logger & plotter"""
-    
+    """VSB View"""
     def __init__(self):
         super().__init__()
-        GRAPH_INTERVAL = 1000
         self.root = Root()
-
-        self.controls_view = VSBControls(self.root)
-        self.controls_view.place(relx=0, rely=0, relwidth=0.45, relheight=0.28)
+        self.cli = CLI(self.root)
+        self.controls = VSBControls(self.root)
+        self.serial = SerialConnector(self.root)
         
-        self.log_view = FileAction(self.root, text="Log CPI")
-        self.log_view.place(relx=0, rely=0.29, relwidth=0.45, relheight=0.06)
-
-        self.serial_view = SerialConnector(self.root)
-        self.serial_view.place(relx=0, rely=0.95, relwidth=0.45, relheight=0.05)
-
-        self.cli_view = CLI(self.root)
-        self.cli_view.place(relx=0.01, rely=0.36, relwidth=0.43, relheight=0.58)
+        self.controls.grid(row=0, column=0)
+        self.cli.grid(row=1, column=0)
+        self.serial.grid(row=2, column=0)
         
-        self.graph_view = LiveGraphTk(self.root, interval=GRAPH_INTERVAL)
-        self.graph_view.place(relx=0.45, rely=0.05, relwidth=0.55, relheight=0.95)
+        self.root.grid_rowconfigure(0, weight=1)
+        self.root.grid_rowconfigure(1, weight=1)
+        self.root.grid_rowconfigure(2, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
         
-        self.help_button = tk.Button(self.root, text="HELP", command=lambda: HelpWindow(self.root))
-        self.help_button.place(relx=0.8, rely=0, relwidth=0.1, relheight=0.05)
-        
-        self.exit_button = tk.Button(self.root, text="EXIT")
-        self.exit_button.place(relx=0.9, rely=0, relwidth=0.1, relheight=0.05)
-        self.exit_button.config(command=self.root.on_close)
-            
     def start(self):
-        """Start the GUI"""
         self.root.mainloop()
+        
+    def bind_cli_send(self, func):
+        self.cli.set_send_func(func)
+        
+    def bind_connect(self, func):
+        self.serial.set_connect_func(func)
+    
+    def bind_button(self, name, func):
+        self.controls.set_button_command(name, func)
+
+    def get_cli_entry(self):
+        return self.cli.get_entry()
+    
+    def get_port(self):
+        return self.serial.get_port()
+
+    def get_baud(self):
+        return self.serial.get_baud()
+    
+    def get_led(self, name):
+        return self.controls.get_led(name)
+    
+    def clear_cli(self):
+        self.cli.clear()
+        
+    def append_cli(self, data):
+        self.cli.insert(data)
+        
+    def set_connected(self, is_connected: bool):
+        self.serial.set_state(is_connected)
+    
+    def set_led(self, name, state):
+        self.controls.set_led(name, state)
+        
+    def set_button_command(self, name, func):
+        self.controls.set_button_command(name, func)
+
