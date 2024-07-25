@@ -1,4 +1,5 @@
-from controller import TestController, TestView
-view = TestView()
-controller = TestController(view)
-controller.start()
+import tkinter as tk
+
+from view.widgets.demos import *
+
+demo_all()

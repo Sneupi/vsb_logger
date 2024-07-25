@@ -1,11 +1,17 @@
 """Package for the GUI frontend of the VSB logger & plotter."""
 
+from typing import TypedDict
 import tkinter as tk
-from .helpers import VSBPanelFrame, FileBrowser, SerialSetup, CLIFrame, \
-                        VSBHelpTopLevel, ControlPair, StatePair
-from .graphing import LiveGraphTk
+from .helpers import VSBHelpTopLevel
+from .controls import ControlsView
+from .log import LogView
+from .cli import CLIView
+from .serialview import SerialView
+from .graph import GraphView
 
-class VSBView(tk.Tk):
+class Frames(TypedDict):
+    pass # TODO
+class View(tk.Tk):
     """GUI frontend for VSB logger & plotter"""
     
     def __init__(self, interval, *args, **kwargs):
@@ -17,19 +23,19 @@ class VSBView(tk.Tk):
         
         self.cv_mode = True
 
-        self.controls = VSBPanelFrame(self)
+        self.controls = ControlsView(self)
         self.controls.place(relx=0, rely=0, relwidth=0.45, relheight=0.28)
         
-        self.filebrowser = FileBrowser(self, action_name="Log CPI")
+        self.filebrowser = LogView(self, action_name="Log CPI")
         self.filebrowser.place(relx=0, rely=0.29, relwidth=0.45, relheight=0.06)
 
-        self.serial_setup = SerialSetup(self)
+        self.serial_setup = SerialView(self)
         self.serial_setup.place(relx=0, rely=0.95, relwidth=0.45, relheight=0.05)
 
-        self.terminal = CLIFrame(self)
+        self.terminal = CLIView(self)
         self.terminal.place(relx=0.01, rely=0.36, relwidth=0.43, relheight=0.58)
         
-        self.graph = LiveGraphTk(self, interval)
+        self.graph = GraphView(self, interval)
         self.graph.place(relx=0.45, rely=0.05, relwidth=0.55, relheight=0.95)
         
         self.help_button = tk.Button(self, text="HELP", command=self.spawn_help)
@@ -40,13 +46,15 @@ class VSBView(tk.Tk):
         self.exit_button.config(command=lambda: self.quit() or self.destroy())
         
         self.controlpair_dict: dict[str, ControlPair]= dict()
-        self.controlpair_dict.update(self.controls.get_controlpairs())
+        self.controlpair_dict.update(self.controls.get_ledbutton())
         self.controlpair_dict.update({self.filebrowser.name: self.filebrowser.action_button})
         self.controlpair_dict.update({self.serial_setup.connect_name: self.serial_setup.connect_button})
         
         self.statepair_dict: dict[str, StatePair] = dict()
-        self.statepair_dict.update(self.controls.get_statepairs())
+        self.statepair_dict.update(self.controls.get_statusframe())
     
+    def __add_frame(self):
+        pass #TODO
     def start(self):
         """Start the GUI"""
         self.mainloop()
