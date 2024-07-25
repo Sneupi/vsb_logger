@@ -4,7 +4,7 @@ class StatusBox(tk.Frame):
     """Frame with a label and a readout field"""
     def __init__(self, master, text:str="???"):
         super().__init__(master)
-        super().configure(width=100, height=40)
+        super().configure(width=100, height=27)
         
         self.label = tk.Label(self, text=text)
         self.readout = tk.Label(self, relief="solid", 

@@ -31,7 +31,7 @@ class SerialConnector(tk.Frame):
         self.refresh_button.pack(side='right', padx=5, pady=5)
     
         self.connect_button = LEDButton(self, text="Connect")
-        self.connect_button.pack(side='right', padx=5, pady=5, fill='both', expand=True)
+        self.connect_button.pack(side='right', padx=5, pady=5)
         
     def set_connect_func(self, func):
         self.connect_button.set_command(command=func)

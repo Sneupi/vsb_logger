@@ -1,6 +1,6 @@
 import tkinter as tk
 
-class HelpView(tk.Toplevel):
+class HelpWindow(tk.Toplevel):
     """Help popout for VSB Logger (tk.Toplevel)"""
     def __init__(self, master):
         super().__init__(master)

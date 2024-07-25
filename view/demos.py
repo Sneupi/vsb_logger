@@ -1,12 +1,11 @@
 import tkinter as tk
-from .cli import CLIView
-from .controls import ControlsView
-from .log import LogView
-from .help import HelpView
+from .controls import VSBControls
+from .widgets.file_action import FileAction
+from .help import HelpWindow
 
 def demo_controls():
     root = tk.Tk()
-    controls = ControlsView(root)
+    controls = VSBControls(root)
     controls.pack(expand=True, fill='both')
     
     controls.set_button_command("Run", lambda: controls.set_led("Run", not controls.get_led("Run")))
@@ -31,7 +30,7 @@ def demo_controls():
 
 def demo_log():
     root = tk.Tk()
-    log = LogView(root)
+    log = FileAction(root, text="(Some Logger)")
     log.pack(expand=True, fill='both')
     def example_setup_log_func():
         print("test toggling the log...")
@@ -41,7 +40,7 @@ def demo_log():
 
 def demo_help():
     root = tk.Tk()
-    button = tk.Button(root, text="Help", command=lambda: HelpView(root))
+    button = tk.Button(root, text="Help", command=lambda: HelpWindow(root))
     button.pack(expand=True, fill='both', padx=10, pady=10)
     root.mainloop()
     

@@ -27,7 +27,7 @@ class SerialThread(threading.Thread):
         except OSError as e:
             pass  # related to in_waiting after serial close
         except UnicodeDecodeError as e:
-            e.reason = "(likely baud mismatch) " + e.reason
+            e.reason = "(possible baud mismatch) " + e.reason
             print(f"SerialThread Error: {e}")
         return False
     
@@ -44,13 +44,12 @@ class SerialThread(threading.Thread):
         return False
     
     def run(self):
+        self.model.trigger_event('connected')
         while self.ser.is_open:
             t = self.__get_tx()
             r = self.__get_rx()
             if not t and not r:
                 time.sleep(0.02)
-            
-        print("done")
         
     def write(self, data: str):
         self.tx_q.put(data)
@@ -58,6 +57,7 @@ class SerialThread(threading.Thread):
     def stop(self):
         if self.is_alive():
             self.ser.close()
+        self.model.trigger_event('disconnected')
         
     def __del__(self):
         self.stop()
@@ -72,7 +72,6 @@ class SerialModel(ObservableModel):
         self._thread = SerialThread(port, baudrate, self)
         self.last_rx = None
         self.last_tx = None
-        self.trigger_event('connected')
         
     def write(self, data: str):
         self._thread.write(data)

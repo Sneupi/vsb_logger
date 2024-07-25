@@ -4,11 +4,10 @@ from .widgets.status_box import StatusBox
 from .widgets.led_button import LEDButton
 from .widgets.widget_grid import WidgetGrid
 
-class ControlsView(tk.Frame):
+class VSBControls(tk.Frame):
     """View for controls panel of VSB (Voltage Sense & Balancing) """
     def __init__(self, master):
         super().__init__(master)
-        
         
         # list[column][row] of each type
         self.ctrl_names = [["Run", "Stop", "Balance", "ExtBus", "MQ Dump", "Show DN"], 

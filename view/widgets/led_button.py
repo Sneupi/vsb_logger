@@ -4,7 +4,7 @@ class LEDButton(tk.Frame):
     """Frame with a button and an indicator"""
     def __init__(self, master, text:str=""):
         super().__init__(master)
-        super().configure(width=100, height=40)
+        super().configure(width=100, height=27)
         default_command = lambda: print(f"{text}: Button not bound")
         
         self.led = tk.Label(self, width=2, relief="solid", borderwidth=1)
