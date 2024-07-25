@@ -38,4 +38,4 @@ class FileAction(tk.Frame):
         self.action_button.set_command(func)
             
     def get_path(self):
-        return self.label.cget("text")
+        return str(self.label.cget("text"))

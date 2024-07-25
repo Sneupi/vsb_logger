@@ -9,11 +9,11 @@ class LEDButton(tk.Frame):
         
         self.led = tk.Label(self, width=2, relief="solid", borderwidth=1)
         self.set_led(False)
-        self.led.place(relx=0, rely=0, relwidth=0.2, relheight=1)
+        self.led.place(relx=0, rely=0, relwidth=0.1, relheight=1)
         
         self.button = tk.Button(self, text=text)
         self.button.configure(command=default_command, text=text)
-        self.button.place(relx=0.2, rely=0, relwidth=0.8, relheight=1)
+        self.button.place(relx=0.1, rely=0, relwidth=0.9, relheight=1)
     
     def set_command(self, command):
         self.button.configure(command=command)

@@ -10,7 +10,7 @@ class SerialThread(threading.Thread):
     synchronous (code-blocking) receive.
     """
     
-    def __init__(self, port, baudrate, model: 'SerialModel'):
+    def __init__(self, port, baudrate, model: 'Model'):
         super().__init__()
         self.model = model
         self.tx_q = queue.Queue()
@@ -62,7 +62,7 @@ class SerialThread(threading.Thread):
     def __del__(self):
         self.stop()
          
-class SerialModel(ObservableModel):
+class Model(ObservableModel):
     """ObservableModel for serial send and receive.
     NOTE: Code-blocking on RX to call registered listener functions
     """
