@@ -79,7 +79,8 @@ class LegendHandler:
     
     def clear(self):
         """remove legend from graph"""
-        self.ax.get_legend().remove()
+        if self.ax.get_legend():
+            self.ax.get_legend().remove()
 
 class LimitHandler:
     """Tracks graph bounds and handles 

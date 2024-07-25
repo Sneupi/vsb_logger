@@ -1,6 +1,6 @@
 
 import tkinter as tk
-from .widgets.status_frame import StatusFrame
+from .widgets.status_box import StatusBox
 from .widgets.led_button import LEDButton
 from .widgets.widget_grid import WidgetGrid
 
@@ -17,7 +17,7 @@ class ControlsView(tk.Frame):
         
         self.but_grid = WidgetGrid(self, LEDButton, self.ctrl_names)
         self.but_grid.pack(side='left', fill='both', expand=True)
-        self.stat_grid = WidgetGrid(self, StatusFrame, self.stat_names)  
+        self.stat_grid = WidgetGrid(self, StatusBox, self.stat_names)  
         self.stat_grid.pack(side='left', fill='both', expand=True)
         
     def get_buttons(self) -> dict:
@@ -28,18 +28,18 @@ class ControlsView(tk.Frame):
         """As dictionary of name: StatusFrame"""
         return self.stat_grid.get_widgets()
     
-    def set_readout(self, name, string):
+    def set_readout(self, name, readout):
         status = self.stat_grid.get_widget(name)
-        if status and isinstance(status, StatusFrame):
-            status.set_readout(string)
+        if status and isinstance(status, StatusBox):
+            status.set_readout(readout)
 
-    def set_led(self, name, state):
-        button = self.but_grid.get_widget(name)
+    def set_led(self, button_name, state):
+        button = self.but_grid.get_widget(button_name)
         if button and isinstance(button, LEDButton):
             button.set_led(state)
     
-    def get_led(self, name):
-        button = self.but_grid.get_widget(name)
+    def get_led(self, button_name):
+        button = self.but_grid.get_widget(button_name)
         if button and isinstance(button, LEDButton):
             return button.get_led()
         return None

@@ -1,6 +1,6 @@
 import tkinter as tk
 
-class StatusFrame(tk.Frame):
+class StatusBox(tk.Frame):
     """Frame with a label and a readout field"""
     def __init__(self, master, text:str="???"):
         super().__init__(master)

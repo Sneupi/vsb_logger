@@ -1,4 +1,4 @@
-from .graphing import LiveGraphTk
+from .widgets.live_graph_tk import LiveGraphTk
 
 class GraphView(LiveGraphTk):
     """Graphing view"""

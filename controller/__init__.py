@@ -1,6 +1,6 @@
 import tkinter as tk
 from model import SerialModel
-from view import View
+from view.view import View
     
 class Controller:
     """Controller for connection between 

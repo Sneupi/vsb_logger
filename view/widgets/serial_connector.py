@@ -3,7 +3,7 @@ import tkinter.ttk as ttk
 from .led_button import LEDButton
 import serial.tools.list_ports
 
-class SerialConnectorFrame(tk.Frame):
+class SerialConnector(tk.Frame):
     """User interface for setting up serial connection"""
     def __init__(self, parent):
         super().__init__(parent)
