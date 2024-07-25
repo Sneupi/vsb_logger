@@ -86,8 +86,22 @@ class Controller:
             self.model.start()
         except Exception as e:
             print(f"SerialController Error: {e}")
-            
-        
+    
+    def _stat_listener(self, model: Model):
+        """RX listener on probed statistics"""
+        if "PVM state :" in model.last_rx:
+            self.view.set_readout("PVM", model.last_rx.split(':')[-1])
+        elif "CTC state :" in model.last_rx:
+            self.view.set_readout("CTC", model.last_rx.split(':')[-1])
+        elif "Last CV   :" in model.last_rx:
+            self.view.set_readout("Last CV", model.last_rx.split(':')[-1])
+        elif "Last CV DN:" in model.last_rx:
+            self.view.set_readout("Last CV DN", model.last_rx.split(':')[-1])
+        elif "Err count :" in model.last_rx:
+            self.view.set_readout("Errs", model.last_rx.split(':')[-1])
+        elif "Last Error:" in model.last_rx:
+            self.view.set_readout("Last Err", model.last_rx.split(':')[-1])
+
     def _graphing_listener(self, model: Model):
         """RX listener"""
         if re.search(r"\d+:\s+\d+", model.last_rx):
@@ -102,6 +116,7 @@ class Controller:
             self.logger.log_rx(model.last_rx)
         self.panel_controller.rx_listener(model)
         self._graphing_listener(model)
+        self._stat_listener(model)
         
     def _tx_listener(self, model: Model):
         self.view.append_cli(model.last_tx)

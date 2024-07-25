@@ -38,7 +38,7 @@ class CLI(tk.Frame):
     def insert(self, msg: str):
         """Insert a message into the terminal"""
         self.out_txt.config(state=tk.NORMAL)
-        self.out_txt.insert(tk.END, "> {}\n".format(msg.rstrip('\n')))
+        self.out_txt.insert(tk.END, "{}\n".format(msg.rstrip('\n')))
         self.out_txt.config(state=tk.DISABLED)
         if self.is_scroll:
             self.out_txt.see(tk.END)

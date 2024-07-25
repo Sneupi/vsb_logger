@@ -93,3 +93,5 @@ class View:
     def set_button_command(self, name, func):
         self.controls.set_button_command(name, func)
 
+    def set_readout(self, name, readout):
+        self.controls.set_readout(name, readout)
