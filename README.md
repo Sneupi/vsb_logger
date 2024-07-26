@@ -1,7 +1,10 @@
+# VSB-LOGGER
+
 Single window, single screen interface for serial communication with the VSB. 
 
-Capable of parsing and displaying metrics from raw data (plots, values), as well as logging all serial transmission in CSV format.
+Displays, plots, and generates CSV logs of realtime metrics from raw data.
+
+<img src="https://github.com/Sneupi/vsb_logger/blob/refractor/demo.gif" width="550" height="350" />
 
 ## Future Additions:
-- Auto-log plot snapshots
 - input scripting via a formatted file
